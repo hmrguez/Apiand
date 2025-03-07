@@ -5,8 +5,18 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <PublishAot>true</PublishAot>
-        <OptimizationPreference>Size</OptimizationPreference>
+<!--        <PublishAot>true</PublishAot>-->
+<!--        <OptimizationPreference>Speed</OptimizationPreference>-->
+<!--        <RuntimeIdentifier>osx-arm64</RuntimeIdentifier>-->
+
+        <!-- Tool-specific properties -->
+        <PackAsTool>true</PackAsTool>
+<!--        <PackageId>Apiand.Cli</PackageId>-->
+        <ToolCommandName>apiand</ToolCommandName>
+        <PackageOutputPath>./nupkg</PackageOutputPath>
+        <Version>0.0.1</Version>
+        <Authors>Hector Rodriguez</Authors>
+        <Description>Apiand CLI tool</Description>
     </PropertyGroup>
 
     <ItemGroup>
