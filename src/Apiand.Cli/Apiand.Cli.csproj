@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Templates\Main\" />
+      <ProjectReference Include="..\Apiand.TemplateEngine\Apiand.TemplateEngine.csproj" />
     </ItemGroup>
 
 </Project>

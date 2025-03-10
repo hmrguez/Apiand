@@ -15,6 +15,22 @@ public class GreetCommand : Command
 
     private void HandleCommand(string name)
     {
-        Console.WriteLine($"Hello {name}!");
+        // Create an instance of the template engine
+        var engine = new TemplateEngine.TemplateEngine();
+        
+        // Define a template with XXX markers
+        string template = "Hello, XXXnameXXX! Welcome to XXXcompanyXXX.";
+        
+        // Create a data object
+        var data = new { name = "John", company = "Apiand" };
+        
+        // Render the template
+        string result = engine.Render(template, data);
+        Console.WriteLine(result);
+        
+        
+        // result will be: "Hello, John! Welcome to Apiand."
+        
+        // Console.WriteLine($"Hello {name}!");
     }
 }
