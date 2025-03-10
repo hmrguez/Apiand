@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apiand.Cli", "src\Apiand.Cli\Apiand.Cli.csproj", "{ECFE4154-D956-4605-B1DF-AA5772D268EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apiand.TemplateEngine", "Apiand.TemplateEngine\Apiand.TemplateEngine.csproj", "{423B670E-21FE-48FD-8ECB-59F0F672D95D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{ECFE4154-D956-4605-B1DF-AA5772D268EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECFE4154-D956-4605-B1DF-AA5772D268EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECFE4154-D956-4605-B1DF-AA5772D268EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{423B670E-21FE-48FD-8ECB-59F0F672D95D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{423B670E-21FE-48FD-8ECB-59F0F672D95D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{423B670E-21FE-48FD-8ECB-59F0F672D95D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{423B670E-21FE-48FD-8ECB-59F0F672D95D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
