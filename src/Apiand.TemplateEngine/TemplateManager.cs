@@ -8,7 +8,8 @@ public class TemplateManager
     
     public TemplateManager()
     {
-        _templatesDirectory = "../Apiand.TemplateEngine/Templates";
+        var assemblyLocation = Path.GetDirectoryName(typeof(TemplateManager).Assembly.Location)!;
+        _templatesDirectory = Path.Combine(assemblyLocation, "Templates");
         Directory.CreateDirectory(_templatesDirectory);
     }
     
