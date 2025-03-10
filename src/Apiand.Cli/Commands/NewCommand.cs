@@ -10,7 +10,7 @@ public class NewCommand : Command
     
     public NewCommand() : base("new", "Creates a new project from a template")
     {
-        _templateManager = new TemplateManager("../Templates");
+        _templateManager = new TemplateManager();
         _processor = new TemplateProcessor();
         
         var templateOption = new Option<string>("--template", "The template to use") { IsRequired = true };

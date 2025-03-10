@@ -6,9 +6,9 @@ public class TemplateManager
 {
     private readonly string _templatesDirectory;
     
-    public TemplateManager(string templatesDirectory)
+    public TemplateManager()
     {
-        _templatesDirectory = templatesDirectory;
+        _templatesDirectory = "../Apiand.TemplateEngine/Templates";
         Directory.CreateDirectory(_templatesDirectory);
     }
     
