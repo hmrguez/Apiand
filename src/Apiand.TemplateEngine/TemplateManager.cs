@@ -1,90 +1,41 @@
-using System.Text.Json;
-
 namespace Apiand.TemplateEngine;
 
 public class TemplateManager
 {
-    private readonly string _templatesDirectory;
-    
-    public TemplateManager()
+    private readonly string _templateBasePath;
+
+    public TemplateManager(string? templateBasePath = null)
     {
-        var assemblyLocation = Path.GetDirectoryName(typeof(TemplateManager).Assembly.Location)!;
-        _templatesDirectory = Path.Combine(assemblyLocation, "Templates");
-        Directory.CreateDirectory(_templatesDirectory);
+        _templateBasePath = templateBasePath ?? Path.Combine(AppContext.BaseDirectory, "Templates");
     }
-    
-    public IEnumerable<TemplateInfo> ListTemplates()
+
+    public string? GetTemplatePath(string? templateId)
     {
-        foreach (var dir in Directory.GetDirectories(_templatesDirectory))
-        {
-            var metadataPath = Path.Combine(dir, "template.json");
-            if (File.Exists(metadataPath))
-            {
-                var metadata = JsonSerializer.Deserialize<TemplateMetadata>(File.ReadAllText(metadataPath));
-                yield return new TemplateInfo
-                {
-                    Id = Path.GetFileName(dir),
-                    Name = metadata.Name,
-                    Description = metadata.Description,
-                    Path = dir
-                };
-            }
-        }
-    }
-    
-    public string GetTemplatePath(string templateId)
-    {
-        string path = Path.Combine(_templatesDirectory, templateId);
+        string path = templateId == null ? _templateBasePath : Path.Combine(_templateBasePath, templateId);
         return Directory.Exists(path) ? path : null;
     }
-    
-    public bool InstallTemplate(string sourcePath, string templateId)
+
+    public Dictionary<string, string> ResolveTemplates(TemplateConfiguration config)
     {
-        if (!Directory.Exists(sourcePath))
-            return false;
-            
-        string targetPath = Path.Combine(_templatesDirectory, templateId);
-        if (Directory.Exists(targetPath))
-            Directory.Delete(targetPath, true);
-            
-        DirectoryCopy(sourcePath, targetPath, true);
-        return true;
+        var resolver = new TemplateResolver(GetTemplatePath(config.TemplatePath)!);
+        return resolver.ResolveTemplatePaths(config);
     }
-    
-    private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+
+    public List<string> GetAvailableTemplates()
     {
-        // Standard recursive directory copy implementation
-        DirectoryInfo dir = new DirectoryInfo(sourceDirName);
-        DirectoryInfo[] dirs = dir.GetDirectories();
-
-        if (!dir.Exists)
-            throw new DirectoryNotFoundException($"Source directory does not exist or could not be found: {sourceDirName}");
-
-        if (!Directory.Exists(destDirName))
-            Directory.CreateDirectory(destDirName);
-
-        FileInfo[] files = dir.GetFiles();
-        foreach (FileInfo file in files)
-        {
-            string temppath = Path.Combine(destDirName, file.Name);
-            file.CopyTo(temppath, true);
-        }
-
-        if (copySubDirs)
-        {
-            foreach (DirectoryInfo subdir in dirs)
-            {
-                string temppath = Path.Combine(destDirName, subdir.Name);
-                DirectoryCopy(subdir.FullName, temppath, true);
-            }
-        }
+        if (!Directory.Exists(_templateBasePath))
+            return new List<string>();
+        
+        return Directory.GetDirectories(_templateBasePath)
+            .Select(Path.GetFileName)
+            .ToList()!;
     }
 }
 
 public class TemplateInfo
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public string Path { get; set; }
+    public required string Id { get; set; }
+    public required string Name { get; set; }
+    public required string Description { get; set; }
+    public required string Path { get; set; }
 }

@@ -6,8 +6,49 @@ namespace Apiand.TemplateEngine;
 public class TemplateProcessor
 {
     private readonly TemplateEngine _engine = new();
+    
+    public void CreateFromTemplateVariants(Dictionary<string, string> templatePaths, string outputPath, Dictionary<string, object> data, TemplateConfiguration config)
+    {
+        // Create base output directory
+        Directory.CreateDirectory(outputPath);
+    
+        foreach (var (module, templatePath) in templatePaths)
+        {
+            // Read template metadata
+            var metadata = ReadTemplateMetadata(templatePath);
+        
+            // Determine module output directory (might be same as base or a subdirectory)
+            string moduleOutputPath = config.Architecture == "single-layer" 
+                ? outputPath 
+                : Path.Combine(outputPath, module);
+            
+            // Create module directory
+            Directory.CreateDirectory(moduleOutputPath);
+            
+            // Process this module template
+            CopyAndProcessDirectory(templatePath, moduleOutputPath, data, metadata);
+        
+            // Execute post-actions if any
+            if (metadata.PostActions?.Count > 0)
+            {
+                ExecutePostActions(moduleOutputPath, metadata.PostActions);
+            }
+        }
+    }
+
+    private TemplateMetadata ReadTemplateMetadata(string templatePath)
+    {
+        string metadataPath = Path.Combine(templatePath, "template.json");
+        if (File.Exists(metadataPath))
+        {
+            string json = File.ReadAllText(metadataPath);
+            return System.Text.Json.JsonSerializer.Deserialize<TemplateMetadata>(json) ?? new TemplateMetadata();
+        }
+    
+        return new TemplateMetadata();
+    }
                 
-    public void CreateFromTemplate(string templatePath, string outputDir, object templateData)
+    public void CreateFromTemplate(string templatePath, string outputDir, object templateData, TemplateConfiguration configuration)
     {
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
@@ -110,7 +151,7 @@ public class TemplateMetadata
     public string Name { get; set; } = "Unnamed Template";
     public string Description { get; set; } = "";
     public List<string> TextFileExtensions { get; set; } = [".cs", ".json", ".xml", ".csproj", ".txt", ".md"];
-    public List<string> ExcludeFiles { get; set; } = [];
-    public List<string> ExcludeDirs { get; set; } = [];
-    public List<string> PostActions { get; set; } = [];
+    public List<string> ExcludeFiles { get; init; } = [];
+    public List<string> ExcludeDirs { get; init; } = [];
+    public List<string> PostActions { get; init; } = [];
 }

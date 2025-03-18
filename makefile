@@ -47,3 +47,13 @@ version:
 .PHONY: demo
 demo:
 	apiand new --template console --output .output/TempApp --name TempApp
+	
+# Demo api
+.PHONY: api
+api:
+	apiand new  \
+               		--output ./output/SimpleApi \
+               		--name "SimpleApi" \
+               		--architecture multi-layer \
+               		--api-type graphql
+               		
