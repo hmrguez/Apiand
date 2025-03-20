@@ -1,5 +1,7 @@
 using Apiand.TemplateEngine.Constants;
 using Apiand.TemplateEngine.Models;
+using Apiand.TemplateEngine.Options;
+using Apiand.TemplateEngine.Utils;
 
 namespace Apiand.TemplateEngine;
 
@@ -16,35 +18,14 @@ public class TemplateResolver
 
     private void LoadTemplateVariants()
     {
-        // Scan the templates directory structure to find all variants
-        // This could be based on folder structure or metadata files
-        
-        // Example structure:
-        // templates/
-        //   multi-layer/
-        //     endpoints/
-        //       default/
-        //       graphql/
-        //       rest/
-        //     infrastructure/
-        //       default/
-        //       mongodb/
-        //       sqlserver/
-        //     application/
-        //       default/
-        //     domain/
-        //       default/
-
-        // For each variant found, add it to the _variants list
-        // This is a simplified implementation - you'd need to actually scan directories
-        foreach (var architecture in Options.ArchitectureTypes)
+        foreach (var architecture in TemplateOptions.ArchitectureTypes)
         {
-            string archPath = Path.Combine(_baseTemplatePath, architecture);
+            string archPath = Path.Combine(_baseTemplatePath, architecture.Humanize());
             if (!Directory.Exists(archPath)) continue;
 
-            foreach (var module in Options.Modules)
+            foreach (var module in TemplateOptions.Modules)
             {
-                string modulePath = Path.Combine(archPath, module);
+                string modulePath = Path.Combine(archPath, module.Humanize());
                 if (!Directory.Exists(modulePath)) continue;
 
                 // Add default variant
@@ -57,11 +38,11 @@ public class TemplateResolver
                 });
 
                 // Add API-specific variants for endpoints
-                if (module == "endpoints")
+                if (module is Module.Presentation)
                 {
-                    foreach (var apiType in Options.EndpointTypes)
+                    foreach (var apiType in TemplateOptions.EndpointTypes)
                     {
-                        string apiPath = Path.Combine(modulePath, apiType);
+                        string apiPath = Path.Combine(modulePath, apiType.Humanize());
                         if (Directory.Exists(apiPath))
                         {
                             _variants.Add(new TemplateVariant
@@ -77,11 +58,11 @@ public class TemplateResolver
                 }
 
                 // Add DB-specific variants for infrastructure
-                if (module == "infrastructure")
+                if (module == Module.Infrastructure)
                 {
-                    foreach (var dbType in Options.InfrastructureTypes)
+                    foreach (var dbType in TemplateOptions.InfrastructureTypes)
                     {
-                        string dbPath = Path.Combine(modulePath, dbType);
+                        string dbPath = Path.Combine(modulePath, dbType.Humanize());
                         if (Directory.Exists(dbPath))
                         {
                             _variants.Add(new TemplateVariant
@@ -99,10 +80,10 @@ public class TemplateResolver
         }
     }
 
-    public Dictionary<string, string> ResolveTemplatePaths(TemplateConfiguration config)
+    public Dictionary<Module, string> ResolveTemplatePaths(TemplateConfiguration config)
     {
-        var modules = Options.Modules;
-        var result = new Dictionary<string, string>();
+        var modules = TemplateOptions.Modules;
+        var result = new Dictionary<Module, string>();
 
         foreach (var module in modules)
         {
@@ -110,8 +91,7 @@ public class TemplateResolver
             var variant = _variants.FirstOrDefault(v => 
                 v.Architecture == config.Architecture && 
                 v.Module == module &&
-                ((v.ApiType == config.ApiType && !string.IsNullOrEmpty(v.ApiType)) || 
-                 (v.DbType == config.DbType && !string.IsNullOrEmpty(v.DbType))));
+                (v.ApiType == config.ApiType || v.DbType == config.DbType));
 
             // Fall back to default variant if specific one not found
             if (variant == null)

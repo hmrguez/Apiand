@@ -1,35 +1,66 @@
 using Apiand.TemplateEngine.Constants;
+using Apiand.TemplateEngine.Options;
+using Apiand.TemplateEngine.Utils;
 
 namespace Apiand.TemplateEngine;
 
-public class TemplateValidator
+public static class TemplateValidator
 {
-    public ValidationResult Validate(TemplateConfiguration config)
+    public static ValidationResult Validate(TemplateConfiguration config)
     {
         var result = new ValidationResult();
 
-        // Validate architecture
-        if (!string.IsNullOrEmpty(config.Architecture) &&
-            !Options.ValidEndpointTypes.ContainsKey(config.Architecture))
-            result.Errors.Add(
-                $"Invalid architecture '{config.Architecture}'. Valid options: {string.Join(", ", Options.ValidEndpointTypes.Keys)}");
+        return config.Architecture switch
+        {
+            null => result.AddError("Architecture must be specified"),
 
-        // If architecture is specified, validate API type
-        if (!string.IsNullOrEmpty(config.Architecture) &&
-            !string.IsNullOrEmpty(config.ApiType) &&
-            Options.ValidEndpointTypes.TryGetValue(config.Architecture, out var validApiTypes) &&
-            !validApiTypes.Contains(config.ApiType))
-            result.Errors.Add(
-                $"API type '{config.ApiType}' is not valid for architecture '{config.Architecture}'. Valid options: {string.Join(", ", validApiTypes)}");
+            var arch when !EnumUtils.GetAll<Architecture>().Contains(arch.Value) =>
+                result.AddError($"Invalid architecture '{arch.Value.Humanize()}'. Valid options: " +
+                                $"{string.Join(", ", EnumUtils.GetAll<Architecture>())}"),
 
-        // If architecture is specified, validate database type
-        if (!string.IsNullOrEmpty(config.Architecture) &&
-            !string.IsNullOrEmpty(config.DbType) &&
-            Options.ValidDbTypes.TryGetValue(config.Architecture, out var validDbTypes) &&
-            !validDbTypes.Contains(config.DbType))
-            result.Errors.Add(
-                $"Database type '{config.DbType}' is not valid for architecture '{config.Architecture}'. Valid options: {string.Join(", ", validDbTypes)}");
+            Architecture.MultiLayer when config.ApiType == null || config.DbType == null =>
+                result.AddErrors(
+                    config.ApiType == null ? "API type must be specified for Multi-Layer architecture" : null,
+                    config.DbType == null ? "Database type must be specified for Multi-Layer architecture" : null),
 
+            var arch => ValidateApiAndDbTypes(result, arch.Value, config.ApiType, config.DbType)
+        };
+    }
+
+    private static ValidationResult ValidateApiAndDbTypes(ValidationResult result, Architecture architecture,
+        Endpoint? apiType, Infrastructure? dbType)
+    {
+        if (apiType.HasValue &&
+            TemplateOptions.ValidEndpointTypes.TryGetValue(architecture, out var validApiTypes) &&
+            !validApiTypes.Contains(apiType.Value))
+        {
+            result.AddError(
+                $"API type '{apiType.Value.Humanize()}' is not valid for architecture '{architecture.Humanize()}'. " +
+                $"Valid options: {string.Join(", ", validApiTypes.Select(v => v.Humanize()))}");
+        }
+
+        if (dbType.HasValue &&
+            TemplateOptions.ValidDbTypes.TryGetValue(architecture, out var validDbTypes) &&
+            !validDbTypes.Contains(dbType.Value))
+        {
+            result.AddError(
+                $"Database type '{dbType.Value.Humanize()}' is not valid for architecture '{architecture.Humanize()}'. " +
+                $"Valid options: {string.Join(", ", validDbTypes.Select(v => v.Humanize()))}");
+        }
+
+        return result;
+    }
+
+    private static ValidationResult AddError(this ValidationResult result, string error)
+    {
+        result.Errors.Add(error);
+        return result;
+    }
+
+    private static ValidationResult AddErrors(this ValidationResult result, params string?[] error)
+    {
+        foreach (var err in error.Where(e => e != null))
+            result.Errors.Add(err!);
         return result;
     }
 }

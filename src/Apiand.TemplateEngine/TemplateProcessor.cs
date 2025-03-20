@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Text.Json;
 using Apiand.TemplateEngine.Models;
+using Apiand.TemplateEngine.Options;
+using Apiand.TemplateEngine.Utils;
 
 namespace Apiand.TemplateEngine;
 
@@ -8,7 +10,7 @@ public class TemplateProcessor
 {
     private readonly TemplateEngine _engine = new();
     
-    public void CreateFromTemplateVariants(Dictionary<string, string> templatePaths, string outputPath, Dictionary<string, string> data, TemplateConfiguration config)
+    public void CreateFromTemplateVariants(Dictionary<Module, string> templatePaths, string outputPath, Dictionary<string, string> data, TemplateConfiguration config)
     {
         Directory.CreateDirectory(outputPath);
     
@@ -16,9 +18,7 @@ public class TemplateProcessor
         {
             var metadata = ReadTemplateMetadata(templatePath);
         
-            string moduleOutputPath = config.Architecture == "single-layer" 
-                ? outputPath 
-                : Path.Combine(outputPath, module);
+            string moduleOutputPath = Path.Combine(outputPath, module.Humanize());
             
             Directory.CreateDirectory(moduleOutputPath);
             

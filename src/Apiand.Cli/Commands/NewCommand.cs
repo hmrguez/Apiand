@@ -1,5 +1,7 @@
 using System.CommandLine;
 using Apiand.TemplateEngine;
+using Apiand.TemplateEngine.Options;
+using Apiand.TemplateEngine.Utils;
 
 namespace Apiand.Cli.Commands;
 
@@ -7,13 +9,11 @@ public class NewCommand : Command
 {
     private readonly TemplateManager _templateManager;
     private readonly TemplateProcessor _processor;
-    private readonly TemplateValidator _validator;
 
     public NewCommand() : base("new", "Creates a new project from a template")
     {
         _templateManager = new TemplateManager();
         _processor = new TemplateProcessor();
-        _validator = new TemplateValidator();
 
         var outputOption = new Option<string>("--output", "The output directory") { IsRequired = true };
         outputOption.AddAlias("-o");
@@ -52,13 +52,13 @@ public class NewCommand : Command
         {
             OutputPath = output,
             ProjectName = name ?? Path.GetFileName(Path.GetFullPath(output)),
-            Architecture = architecture,
-            ApiType = apiType,
-            DbType = dbType,
+            Architecture = architecture.Dehumanize<Architecture>(),
+            ApiType = apiType.Dehumanize<Endpoint>(),
+            DbType = dbType.Dehumanize<Infrastructure>(),
         };
 
         // Validate configuration
-        var validationResult = _validator.Validate(config);
+        var validationResult = TemplateValidator.Validate(config);
         if (!validationResult.IsValid)
         {
             Console.ForegroundColor = ConsoleColor.Red;
