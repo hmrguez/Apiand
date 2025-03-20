@@ -6,13 +6,13 @@ public class TemplateEngine
 {
     private readonly Dictionary<string, ParsedTemplate> _templateCache = new();
     
-    public string Render(string templateContent, object data)
+    public string Render(string templateContent, Dictionary<string, string> data)
     {
         var parsed = Parse(templateContent);
         return RenderTemplate(parsed, data);
     }
     
-    public string RenderFromFile(string filePath, object data)
+    public string RenderFromFile(string filePath, Dictionary<string, string> data)
     {
         if (!_templateCache.TryGetValue(filePath, out var template))
         {
@@ -80,11 +80,9 @@ public class TemplateEngine
         return new ParsedTemplate { Segments = segments };
     }
     
-    private string RenderTemplate(ParsedTemplate template, object data)
+    private string RenderTemplate(ParsedTemplate template, Dictionary<string, string> properties)
     {
         var result = new StringBuilder();
-        var properties = data.GetType().GetProperties()
-            .ToDictionary(p => p.Name, p => p);
             
         foreach (var segment in template.Segments)
         {
@@ -96,8 +94,7 @@ public class TemplateEngine
             {
                 if (properties.TryGetValue(segment.Content, out var property))
                 {
-                    var value = property.GetValue(data);
-                    result.Append(value?.ToString() ?? string.Empty);
+                    result.Append(property ?? string.Empty);
                 }
             }
         }

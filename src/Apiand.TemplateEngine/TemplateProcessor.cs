@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using Apiand.TemplateEngine.Models;
 
 namespace Apiand.TemplateEngine;
 
@@ -7,28 +8,22 @@ public class TemplateProcessor
 {
     private readonly TemplateEngine _engine = new();
     
-    public void CreateFromTemplateVariants(Dictionary<string, string> templatePaths, string outputPath, Dictionary<string, object> data, TemplateConfiguration config)
+    public void CreateFromTemplateVariants(Dictionary<string, string> templatePaths, string outputPath, Dictionary<string, string> data, TemplateConfiguration config)
     {
-        // Create base output directory
         Directory.CreateDirectory(outputPath);
     
         foreach (var (module, templatePath) in templatePaths)
         {
-            // Read template metadata
             var metadata = ReadTemplateMetadata(templatePath);
         
-            // Determine module output directory (might be same as base or a subdirectory)
             string moduleOutputPath = config.Architecture == "single-layer" 
                 ? outputPath 
                 : Path.Combine(outputPath, module);
             
-            // Create module directory
             Directory.CreateDirectory(moduleOutputPath);
             
-            // Process this module template
             CopyAndProcessDirectory(templatePath, moduleOutputPath, data, metadata);
         
-            // Execute post-actions if any
             if (metadata.PostActions?.Count > 0)
             {
                 ExecutePostActions(moduleOutputPath, metadata.PostActions);
@@ -42,34 +37,13 @@ public class TemplateProcessor
         if (File.Exists(metadataPath))
         {
             string json = File.ReadAllText(metadataPath);
-            return System.Text.Json.JsonSerializer.Deserialize<TemplateMetadata>(json) ?? new TemplateMetadata();
+            return JsonSerializer.Deserialize<TemplateMetadata>(json) ?? new TemplateMetadata();
         }
     
         return new TemplateMetadata();
     }
                 
-    public void CreateFromTemplate(string templatePath, string outputDir, object templateData, TemplateConfiguration configuration)
-    {
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
-                    
-        // Process template metadata if exists
-        var metadataPath = Path.Combine(templatePath, "template.json");
-        TemplateMetadata metadata = File.Exists(metadataPath) 
-            ? JsonSerializer.Deserialize<TemplateMetadata>(File.ReadAllText(metadataPath))! 
-            : new TemplateMetadata();
-                    
-        // Copy and process all files recursively
-        CopyAndProcessDirectory(templatePath, outputDir, templateData, metadata);
-                    
-        // Run post-creation commands if any
-        if (metadata.PostActions?.Count > 0)
-        {
-            ExecutePostActions(outputDir, metadata.PostActions);
-        }
-    }
-                
-    private void CopyAndProcessDirectory(string sourcePath, string targetPath, object data, TemplateMetadata metadata)
+    private void CopyAndProcessDirectory(string sourcePath, string targetPath, Dictionary<string, string> data, TemplateMetadata metadata)
     {
         // Get source directories
         foreach (var directory in Directory.GetDirectories(sourcePath))
@@ -119,7 +93,7 @@ public class TemplateProcessor
         }
     }
                 
-    private string ProcessName(string name, object data)
+    private string ProcessName(string name, Dictionary<string, string> data)
     {
         // Process names that contain variables like "XXXprojectNameXXX.csproj"
         return _engine.Render(name, data);
@@ -144,14 +118,4 @@ public class TemplateProcessor
             process?.WaitForExit();
         }
     }
-}
-            
-public class TemplateMetadata
-{
-    public string Name { get; set; } = "Unnamed Template";
-    public string Description { get; set; } = "";
-    public List<string> TextFileExtensions { get; set; } = [".cs", ".json", ".xml", ".csproj", ".txt", ".md"];
-    public List<string> ExcludeFiles { get; init; } = [];
-    public List<string> ExcludeDirs { get; init; } = [];
-    public List<string> PostActions { get; init; } = [];
 }

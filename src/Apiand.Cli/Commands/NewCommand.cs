@@ -15,10 +15,6 @@ public class NewCommand : Command
         _processor = new TemplateProcessor();
         _validator = new TemplateValidator();
 
-        // Base options
-        var templateOption = new Option<string>("--template", "The template to use") { IsRequired = false };
-        templateOption.AddAlias("-t");
-
         var outputOption = new Option<string>("--output", "The output directory") { IsRequired = true };
         outputOption.AddAlias("-o");
 
@@ -38,43 +34,27 @@ public class NewCommand : Command
         var dbTypeOption = new Option<string>("--db-type", "Database type (mongodb, sqlserver, postgres, none)");
         dbTypeOption.AddAlias("-db");
 
-        // Module options for multi-layer architectures
-        var modulesOption = new Option<string[]>("--modules",
-            "Modules to include (endpoints, application, infrastructure, domain)");
-        modulesOption.AddAlias("-m");
-
-        AddOption(templateOption);
         AddOption(outputOption);
         AddOption(nameOption);
         AddOption(architectureOption);
         AddOption(apiTypeOption);
         AddOption(dbTypeOption);
-        AddOption(modulesOption);
 
-        this.SetHandler(HandleCommand, templateOption, outputOption, nameOption, architectureOption, apiTypeOption,
-            dbTypeOption, modulesOption);
+        this.SetHandler(HandleCommand, outputOption, nameOption, architectureOption, apiTypeOption,
+            dbTypeOption);
     }
 
-    private void HandleCommand(string? templateId, string output, string name, string architecture, string apiType,
-        string dbType, string[] modules)
+    private void HandleCommand(string output, string? name, string architecture, string apiType,
+        string dbType)
     {
-        var templatePath = _templateManager.GetTemplatePath(templateId);
-        if (templatePath == null)
-        {
-            Console.WriteLine($"Template '{templateId}' not found.");
-            return;
-        }
-
         // Create template configuration
         var config = new TemplateConfiguration
         {
-            TemplatePath = templatePath,
             OutputPath = output,
             ProjectName = name ?? Path.GetFileName(Path.GetFullPath(output)),
             Architecture = architecture,
             ApiType = apiType,
             DbType = dbType,
-            Modules = ["endpoints", "application", "infrastructure", "domain"]
         };
 
         // Validate configuration
@@ -101,7 +81,7 @@ public class NewCommand : Command
         }
 
         // Process the template
-        var data = new Dictionary<string, object>
+        var data = new Dictionary<string, string>
         {
             ["name"] = config.ProjectName,
         };

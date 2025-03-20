@@ -1,14 +1,7 @@
-namespace Apiand.TemplateEngine;
+using Apiand.TemplateEngine.Constants;
+using Apiand.TemplateEngine.Models;
 
-public class TemplateVariant
-{
-    public required string BasePath { get; init; }
-    public required string Architecture { get; init; }
-    public string? ApiType { get; init; }
-    public string? DbType { get; init; }
-    public string? Module { get; init; }
-    public bool IsDefault { get; init; }
-}
+namespace Apiand.TemplateEngine;
 
 public class TemplateResolver
 {
@@ -44,12 +37,12 @@ public class TemplateResolver
 
         // For each variant found, add it to the _variants list
         // This is a simplified implementation - you'd need to actually scan directories
-        foreach (var architecture in new[] { "single-layer", "multi-layer", "microservices" })
+        foreach (var architecture in Options.ArchitectureTypes)
         {
             string archPath = Path.Combine(_baseTemplatePath, architecture);
             if (!Directory.Exists(archPath)) continue;
 
-            foreach (var module in new[] { "endpoints", "application", "infrastructure", "domain" })
+            foreach (var module in Options.Modules)
             {
                 string modulePath = Path.Combine(archPath, module);
                 if (!Directory.Exists(modulePath)) continue;
@@ -66,7 +59,7 @@ public class TemplateResolver
                 // Add API-specific variants for endpoints
                 if (module == "endpoints")
                 {
-                    foreach (var apiType in new[] { "rest", "graphql", "grpc" })
+                    foreach (var apiType in Options.EndpointTypes)
                     {
                         string apiPath = Path.Combine(modulePath, apiType);
                         if (Directory.Exists(apiPath))
@@ -86,7 +79,7 @@ public class TemplateResolver
                 // Add DB-specific variants for infrastructure
                 if (module == "infrastructure")
                 {
-                    foreach (var dbType in new[] { "mongodb", "sqlserver", "postgres" })
+                    foreach (var dbType in Options.InfrastructureTypes)
                     {
                         string dbPath = Path.Combine(modulePath, dbType);
                         if (Directory.Exists(dbPath))
@@ -108,9 +101,10 @@ public class TemplateResolver
 
     public Dictionary<string, string> ResolveTemplatePaths(TemplateConfiguration config)
     {
+        var modules = Options.Modules;
         var result = new Dictionary<string, string>();
 
-        foreach (var module in config.Modules)
+        foreach (var module in modules)
         {
             // Try to find specific variant first
             var variant = _variants.FirstOrDefault(v => 

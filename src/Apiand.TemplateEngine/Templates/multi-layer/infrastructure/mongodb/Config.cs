@@ -1,1 +1,1 @@
-Configuration for mongo.cs
+Configuration for mongo.cs XXXnameXXX

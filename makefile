@@ -51,7 +51,8 @@ api:
                		--output $(PLAYGROUND_DIR)/SimpleApi \
                		--name "SimpleApi" \
                		--architecture multi-layer \
-               		--api-type graphql
+               		--api-type graphql \
+               		--db-type mongodb
                		
 # Demo and reinstall
 .PHONY: demo-reinstall
