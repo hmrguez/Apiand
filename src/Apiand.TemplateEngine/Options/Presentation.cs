@@ -1,7 +1,7 @@
 namespace Apiand.TemplateEngine.Options;
 
-public enum Infrastructure
+public enum Presentation
 {
-    MongoDB,
+    Rest,
     Default
 }

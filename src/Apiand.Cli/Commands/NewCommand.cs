@@ -33,19 +33,28 @@ public class NewCommand : Command
         // Database options
         var dbTypeOption = new Option<string>("--db-type", "Database type (mongodb, sqlserver, postgres, none)");
         dbTypeOption.AddAlias("-db");
+        
+        // Application and domain options
+        var applicationOption = new Option<string>("--application", "Application layer type (mvc, webapi, none)");
+        applicationOption.AddAlias("-app");
+        
+        var domainOption = new Option<string>("--domain", "Domain layer type (entityframework, dapper, none)");
+        domainOption.AddAlias("-dom");
 
         AddOption(outputOption);
         AddOption(nameOption);
         AddOption(architectureOption);
         AddOption(apiTypeOption);
         AddOption(dbTypeOption);
+        AddOption(applicationOption);
+        AddOption(domainOption);
 
         this.SetHandler(HandleCommand, outputOption, nameOption, architectureOption, apiTypeOption,
-            dbTypeOption);
+            dbTypeOption, applicationOption, domainOption);
     }
 
     private void HandleCommand(string output, string? name, string architecture, string apiType,
-        string dbType)
+        string dbType, string? application, string? domain)
     {
         // Create template configuration
         var config = new TemplateConfiguration
@@ -53,8 +62,10 @@ public class NewCommand : Command
             OutputPath = output,
             ProjectName = name ?? Path.GetFileName(Path.GetFullPath(output)),
             Architecture = architecture.Dehumanize<Architecture>(),
-            ApiType = apiType.Dehumanize<Endpoint>(),
+            ApiType = apiType.Dehumanize<Presentation>(),
             DbType = dbType.Dehumanize<Infrastructure>(),
+            Application = application?.Dehumanize<Application>() ?? Application.Default,
+            Domain = domain?.Dehumanize<Domain>() ?? Domain.Default,
         };
 
         // Validate configuration

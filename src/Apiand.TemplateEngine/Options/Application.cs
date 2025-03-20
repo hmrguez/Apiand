@@ -1,6 +1,6 @@
 namespace Apiand.TemplateEngine.Options;
 
-public enum Endpoint
+public enum Application
 {
-    GraphQL
+    Default
 }

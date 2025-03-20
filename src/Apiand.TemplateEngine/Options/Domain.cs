@@ -1,7 +1,6 @@
 namespace Apiand.TemplateEngine.Options;
 
-public enum Infrastructure
+public enum Domain
 {
-    MongoDB,
     Default
 }

@@ -51,7 +51,7 @@ api:
                		--output $(PLAYGROUND_DIR)/SimpleApi \
                		--name "SimpleApi" \
                		--architecture multi-layer \
-               		--api-type graph-q-l \
+               		--api-type rest \
                		--db-type mongo-d-b
                		
 # Demo and reinstall

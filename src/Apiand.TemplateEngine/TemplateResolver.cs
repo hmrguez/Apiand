@@ -28,19 +28,51 @@ public class TemplateResolver
                 string modulePath = Path.Combine(archPath, module.Humanize());
                 if (!Directory.Exists(modulePath)) continue;
 
-                // Add default variant
-                _variants.Add(new TemplateVariant
-                {
-                    BasePath = Path.Combine(modulePath, "default"),
-                    Architecture = architecture,
-                    Module = module,
-                    IsDefault = true
-                });
+                bool isFirstVariantForModule = true;
 
-                // Add API-specific variants for endpoints
+                if (module == Module.Application)
+                {
+                    foreach (var applicationLayer in TemplateOptions.ApplicationLayerTypes)
+                    {
+                        string apiPath = Path.Combine(modulePath, applicationLayer.Humanize());
+                        if (Directory.Exists(apiPath))
+                        {
+                            _variants.Add(new TemplateVariant
+                            {
+                                BasePath = apiPath,
+                                Architecture = architecture,
+                                Module = module,
+                                Application = applicationLayer,
+                                IsDefault = isFirstVariantForModule
+                            });
+                            isFirstVariantForModule = false;
+                        }
+                    }
+                }
+
+                if (module == Module.Domain)
+                {
+                    foreach (var domain in TemplateOptions.DomainTypes)
+                    {
+                        string apiPath = Path.Combine(modulePath, domain.Humanize());
+                        if (Directory.Exists(apiPath))
+                        {
+                            _variants.Add(new TemplateVariant
+                            {
+                                BasePath = apiPath,
+                                Architecture = architecture,
+                                Module = module,
+                                Domain = domain,
+                                IsDefault = isFirstVariantForModule
+                            });
+                            isFirstVariantForModule = false;
+                        }
+                    }
+                }
+
                 if (module is Module.Presentation)
                 {
-                    foreach (var apiType in TemplateOptions.EndpointTypes)
+                    foreach (var apiType in TemplateOptions.PresentationTypes)
                     {
                         string apiPath = Path.Combine(modulePath, apiType.Humanize());
                         if (Directory.Exists(apiPath))
@@ -51,13 +83,13 @@ public class TemplateResolver
                                 Architecture = architecture,
                                 Module = module,
                                 ApiType = apiType,
-                                IsDefault = false
+                                IsDefault = isFirstVariantForModule
                             });
+                            isFirstVariantForModule = false;
                         }
                     }
                 }
 
-                // Add DB-specific variants for infrastructure
                 if (module == Module.Infrastructure)
                 {
                     foreach (var dbType in TemplateOptions.InfrastructureTypes)
@@ -71,8 +103,9 @@ public class TemplateResolver
                                 Architecture = architecture,
                                 Module = module,
                                 DbType = dbType,
-                                IsDefault = false
+                                IsDefault = isFirstVariantForModule
                             });
+                            isFirstVariantForModule = false;
                         }
                     }
                 }
@@ -88,10 +121,11 @@ public class TemplateResolver
         foreach (var module in modules)
         {
             // Try to find specific variant first
-            var variant = _variants.FirstOrDefault(v => 
-                v.Architecture == config.Architecture && 
+            var variant = _variants.FirstOrDefault(v =>
+                v.Architecture == config.Architecture &&
                 v.Module == module &&
-                (v.ApiType == config.ApiType || v.DbType == config.DbType));
+                (v.ApiType == config.ApiType || v.DbType == config.DbType || v.Application == config.Application ||
+                 v.Domain == config.Domain));
 
             // Fall back to default variant if specific one not found
             if (variant == null)

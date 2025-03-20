@@ -28,7 +28,7 @@ public static class TemplateValidator
     }
 
     private static ValidationResult ValidateApiAndDbTypes(ValidationResult result, Architecture architecture,
-        Endpoint? apiType, Infrastructure? dbType)
+        Presentation? apiType, Infrastructure? dbType)
     {
         if (apiType.HasValue &&
             TemplateOptions.ValidEndpointTypes.TryGetValue(architecture, out var validApiTypes) &&
