@@ -3,6 +3,7 @@ TOOL_NAME = Apiand.Cli
 CONFIGURATION = Release
 OUTPUT_DIR = ./nupkg
 PROJECT_DIR = ./src/Apiand.Cli
+PLAYGROUND_DIR = ./.output
 
 # Default target
 .PHONY: default
@@ -11,8 +12,8 @@ default: install
 # Clean the output directory
 .PHONY: clean
 clean:
-	rm -rf $(OUTPUT_DIR)
-	mkdir -p $(OUTPUT_DIR)
+	rm -rf $(PLAYGROUND_DIR)
+	mkdir -p $(PLAYGROUND_DIR)
 
 # Build the project
 .PHONY: build
@@ -43,17 +44,16 @@ reinstall: uninstall pack install
 version:
 	dotnet tool list --global | grep $(TOOL_NAME)
 	
-# Demo the tool
-.PHONY: demo
-demo:
-	apiand new --template console --output .output/TempApp --name TempApp
-	
 # Demo api
 .PHONY: api
 api:
 	apiand new  \
-               		--output ./output/SimpleApi \
+               		--output $(PLAYGROUND_DIR)/SimpleApi \
                		--name "SimpleApi" \
                		--architecture multi-layer \
                		--api-type graphql
+               		
+# Demo and reinstall
+.PHONY: demo-reinstall
+demo-reinstall: clean reinstall api
                		
