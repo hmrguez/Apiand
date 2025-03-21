@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
 using Apiand.TemplateEngine.Models;
-using Apiand.TemplateEngine.Options;
-using Apiand.TemplateEngine.Utils;
 
 namespace Apiand.TemplateEngine;
 
@@ -10,7 +8,7 @@ public class TemplateProcessor
 {
     private readonly TemplateEngine _engine = new();
     
-    public void CreateFromTemplateVariants(Dictionary<Module, string> templatePaths, string outputPath, Dictionary<string, string> data, TemplateConfiguration config)
+    public void CreateFromTemplateVariants(Dictionary<string, string> templatePaths, string outputPath, Dictionary<string, string> data)
     {
         Directory.CreateDirectory(outputPath);
     
@@ -18,13 +16,13 @@ public class TemplateProcessor
         {
             var metadata = ReadTemplateMetadata(templatePath);
         
-            string moduleOutputPath = Path.Combine(outputPath, module.Humanize());
+            string moduleOutputPath = Path.Combine(outputPath, module);
             
             Directory.CreateDirectory(moduleOutputPath);
             
             CopyAndProcessDirectory(templatePath, moduleOutputPath, data, metadata);
         
-            if (metadata.PostActions?.Count > 0)
+            if (metadata.PostActions.Count > 0)
             {
                 ExecutePostActions(moduleOutputPath, metadata.PostActions);
             }

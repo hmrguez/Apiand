@@ -1,18 +1,15 @@
 using System.CommandLine;
 using Apiand.TemplateEngine;
-using Apiand.TemplateEngine.Options;
-using Apiand.TemplateEngine.Utils;
+using Apiand.TemplateEngine.Models;
 
 namespace Apiand.Cli.Commands;
 
 public class NewCommand : Command
 {
-    private readonly TemplateManager _templateManager;
     private readonly TemplateProcessor _processor;
 
     public NewCommand() : base("new", "Creates a new project from a template")
     {
-        _templateManager = new TemplateManager();
         _processor = new TemplateProcessor();
 
         var outputOption = new Option<string>("--output", "The output directory") { IsRequired = true };
@@ -56,48 +53,48 @@ public class NewCommand : Command
     private void HandleCommand(string output, string? name, string architecture, string apiType,
         string dbType, string? application, string? domain)
     {
-        // Create template configuration
-        var config = new TemplateConfiguration
+        var arch = ArchitectureTypeFactory.Create(architecture);
+        arch.LoadVariants(TemplateUtils.TemplatePath);
+
+        var commandOptions = new CommandOptions()
         {
             OutputPath = output,
-            ProjectName = name ?? Path.GetFileName(Path.GetFullPath(output)),
-            Architecture = architecture.Dehumanize<Architecture>(),
-            ApiType = apiType.Dehumanize<Presentation>(),
-            DbType = dbType.Dehumanize<Infrastructure>(),
-            Application = application?.Dehumanize<Application>() ?? Application.Default,
-            Domain = domain?.Dehumanize<Domain>() ?? Domain.Default,
+            ProjectName = name,
+            Architecture = architecture,
+            ApiType = apiType,
+            DbType = dbType,
+            Application = application,
+            Domain = domain
         };
-
-        // Validate configuration
-        var validationResult = TemplateValidator.Validate(config);
-        if (!validationResult.IsValid)
+        
+        var config = arch.BuildConfig(commandOptions);
+        var validation = arch.Validate(config);
+        if (!validation.IsValid)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Invalid configuration:");
-            foreach (var error in validationResult.Errors)
+            foreach (var error in validation.Errors)
             {
                 Console.WriteLine($"- {error}");
             }
-
+        
             Console.ResetColor();
             return;
         }
-        
-        // Resolve the template variants
-        var templatePaths = _templateManager.ResolveTemplates(config);
+
+        var templatePaths = arch.Resolve(config);
         if (templatePaths.Count == 0)
         {
             Console.WriteLine("No matching templates found for the given configuration.");
             return;
         }
-
-        // Process the template
+        
         var data = new Dictionary<string, string>
         {
             ["name"] = config.ProjectName,
         };
         
-        _processor.CreateFromTemplateVariants(templatePaths, output, data, config);
+        _processor.CreateFromTemplateVariants(templatePaths, output, data);
         Console.WriteLine($"Project created in {output}");
     }
 }

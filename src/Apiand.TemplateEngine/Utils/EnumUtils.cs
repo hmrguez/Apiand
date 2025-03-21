@@ -17,7 +17,7 @@ public static class EnumUtils
         string name = value.ToString();
 
         // Add a space before each capital letter and make it lowercase
-        string result = Regex.Replace(name, "([A-Z])", " $1").Trim().ToLower();
+        string result = Regex.Replace(name, "([A-Z])", " $1").Trim();
 
         // Replace spaces with hyphens
         return Regex.Replace(result, @"\s+", "-");
