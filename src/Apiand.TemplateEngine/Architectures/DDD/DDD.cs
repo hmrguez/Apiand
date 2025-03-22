@@ -6,7 +6,7 @@ namespace Apiand.TemplateEngine.Architectures.DDD;
 public sealed class DDD : ArchitectureType
 {
     private readonly List<DddTemplateVariant> _variants = [];
-    public override string Name => "ddd";
+    public override string Name => "DDD";
 
     public override void LoadVariants(string basePath)
     {
@@ -22,7 +22,7 @@ public sealed class DDD : ArchitectureType
 
     public override TemplateConfiguration BuildConfig(CommandOptions commandOptions)
     {
-        return new DddTemplateConfiguration
+        var temp = new DddTemplateConfiguration
         {
             Application = GetOrDefault(commandOptions.Application),
             Domain = GetOrDefault(commandOptions.Domain),
@@ -31,6 +31,9 @@ public sealed class DDD : ArchitectureType
             OutputPath = commandOptions.OutputPath,
             ProjectName = commandOptions.ProjectName ?? Path.GetFileName(Path.GetFullPath(commandOptions.OutputPath))
         };
+
+
+        return temp;
     }
 
     private static Option? GetOrDefault(string? value)
@@ -48,7 +51,7 @@ public sealed class DDD : ArchitectureType
 
         // Validate Presentation option
         if (dddConfig.Presentation == null)
-            result.AddError("API type must be specified for DDD architecture");
+            result.AddError("A valid API type must be specified for DDD architecture");
         else if (!DddOptions.GetByLayer(Layer.Presentation).Contains(dddConfig.Presentation.Value))
             result.AddError(
                 $"API type '{dddConfig.Presentation.Value.Humanize()}' is not valid for DDD architecture. " +
@@ -56,7 +59,7 @@ public sealed class DDD : ArchitectureType
 
         // Validate Infrastructure option
         if (dddConfig.Infrastructure == null)
-            result.AddError("Database type must be specified for DDD architecture");
+            result.AddError("A valid Database type must be specified for DDD architecture");
         else if (!DddOptions.GetByLayer(Layer.Infrastructure).Contains(dddConfig.Infrastructure.Value))
             result.AddError(
                 $"Database type '{dddConfig.Infrastructure.Value.Humanize()}' is not valid for DDD architecture. " +
@@ -64,7 +67,7 @@ public sealed class DDD : ArchitectureType
 
         // Validate Application option
         if (dddConfig.Application == null)
-            result.AddError("Application type must be specified for DDD architecture");
+            result.AddError("A valid Application type must be specified for DDD architecture");
         else if (!DddOptions.GetByLayer(Layer.Application).Contains(dddConfig.Application.Value))
             result.AddError(
                 $"Application type '{dddConfig.Application.Value.Humanize()}' is not valid for DDD architecture. " +
@@ -72,7 +75,7 @@ public sealed class DDD : ArchitectureType
 
         // Validate Domain option
         if (dddConfig.Domain == null)
-            result.AddError("Domain type must be specified for DDD architecture");
+            result.AddError("A valid Domain type must be specified for DDD architecture");
         else if (!DddOptions.GetByLayer(Layer.Domain).Contains(dddConfig.Domain.Value))
             result.AddError($"Domain type '{dddConfig.Domain.Value.Humanize()}' is not valid for DDD architecture. " +
                             $"Valid options: {string.Join(", ", DddOptions.GetByLayer(Layer.Domain).Select(v => v.Humanize()))}");

@@ -3,7 +3,7 @@ namespace Apiand.TemplateEngine.Architectures.DDD;
 public enum Option
 {
     Default,
-    GraphQL,
+    Rest,
     MongoDB
 }
 
@@ -13,7 +13,7 @@ public static class DddOptions
     {
         { Layer.Application, [Option.Default] },
         { Layer.Domain, [Option.Default] },
-        { Layer.Presentation, [Option.Default, Option.GraphQL] },
+        { Layer.Presentation, [Option.Default, Option.Rest] },
         { Layer.Infrastructure, [Option.Default, Option.MongoDB] }
     };
 

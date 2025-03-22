@@ -50,9 +50,9 @@ api:
 	apiand new  \
                		--output $(PLAYGROUND_DIR)/SimpleApi \
                		--name "SimpleApi" \
-               		--architecture multi-layer \
-               		--api-type rest \
-               		--db-type mongo-d-b
+               		--architecture DDD \
+               		--api-type Rest \
+               		--db-type Mongo-D-B
                		
 # Demo and reinstall
 .PHONY: demo-reinstall
