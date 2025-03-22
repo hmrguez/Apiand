@@ -13,4 +13,12 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Utils\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Apiand.Extensions\Apiand.Extensions.csproj" />
+    </ItemGroup>
 </Project>
