@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apiand.Cli", "src\Apiand.Cl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apiand.TemplateEngine", "src\Apiand.TemplateEngine\Apiand.TemplateEngine.csproj", "{31F019C4-5269-4AF4-8819-2E4FF9962923}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apiand.Extensions", "src\Apiand.Extensions\Apiand.Extensions.csproj", "{39356962-4E54-4203-8E41-823C5146BAE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{31F019C4-5269-4AF4-8819-2E4FF9962923}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31F019C4-5269-4AF4-8819-2E4FF9962923}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31F019C4-5269-4AF4-8819-2E4FF9962923}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39356962-4E54-4203-8E41-823C5146BAE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39356962-4E54-4203-8E41-823C5146BAE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39356962-4E54-4203-8E41-823C5146BAE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39356962-4E54-4203-8E41-823C5146BAE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

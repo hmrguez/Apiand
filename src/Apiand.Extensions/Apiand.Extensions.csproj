@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <!-- NuGet package properties -->
+        <PackageId>Apiand.Extensions</PackageId>
+        <Version>0.0.2</Version>
+        <Authors>hmrguez</Authors>
+        <Company>Apiand</Company>
+        <Description>A library for common models for the Apiand framework</Description>
+        <PackageTags>result;error-handling;functional</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/hmrguez/Apiand</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/hmrguez/Apiand.git</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+</Project>
