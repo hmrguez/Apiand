@@ -23,16 +23,16 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Restore dependencies
-        run: dotnet restore ./src/Apiand.CLI/Apiand.CLI.csproj
+        run: dotnet restore ./src/Apiand.Cli/Apiand.Cli.csproj
 
       - name: Build
-        run: dotnet build ./src/Apiand.CLI/Apiand.CLI.csproj --configuration Release --no-restore
+        run: dotnet build ./src/Apiand.Cli/Apiand.Cli.csproj --configuration Release --no-restore
 
       - name: Test
         run: dotnet test --configuration Release --no-build
 
       - name: Pack
-        run: dotnet pack ./src/Apiand.CLI/Apiand.CLI.csproj --configuration Release --no-build --output ./artifacts
+        run: dotnet pack ./src/Apiand.Cli/Apiand.Cli.csproj --configuration Release --no-build --output ./artifacts
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
