@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 8.0.x
 
     - name: Restore dependencies
       run: dotnet restore ./src/Apiand.Extensions/Apiand.Extensions.csproj
@@ -35,7 +35,7 @@ jobs:
       run: dotnet pack ./src/Apiand.Extensions/Apiand.Extensions.csproj --configuration Release --no-build --output ./artifacts
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: extensions-package
         path: ./artifacts/*.nupkg
