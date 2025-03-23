@@ -14,7 +14,7 @@
 <!--        <PackageId>Apiand.Cli</PackageId>-->
         <ToolCommandName>apiand</ToolCommandName>
         <PackageOutputPath>./nupkg</PackageOutputPath>
-        <Version>0.0.3</Version>
+        <Version>0.0.4</Version>
         <Authors>Hector Rodriguez</Authors>
         <Description>Apiand CLI tool</Description>
     </PropertyGroup>

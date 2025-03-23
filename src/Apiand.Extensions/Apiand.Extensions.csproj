@@ -7,7 +7,7 @@
 
         <!-- NuGet package properties -->
         <PackageId>Apiand.Extensions</PackageId>
-        <Version>0.0.2</Version>
+        <Version>0.0.4</Version>
         <Authors>hmrguez</Authors>
         <Company>Apiand</Company>
         <Description>A library for common models for the Apiand framework</Description>
@@ -17,6 +17,13 @@
         <RepositoryUrl>https://github.com/hmrguez/Apiand.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <UserSecretsId>f6ba7b1d-3ea8-4d5a-9850-2ad08034ec01</UserSecretsId>
     </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.3" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3" />
+    </ItemGroup>
 
 </Project>

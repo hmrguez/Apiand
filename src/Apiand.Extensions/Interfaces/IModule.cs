@@ -1,0 +1,46 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Apiand.Extensions.Interfaces;
+
+/// <summary>
+/// Interface for defining a module in the Apiand framework.
+/// </summary>
+public interface IModule
+{
+    /// <summary>
+    /// Configures the services required by the module.
+    /// </summary>
+    /// <param name="services">The service collection to add services to.</param>
+    /// <param name="configuration">The application configuration.</param>
+    void ConfigureServices(IServiceCollection services, IConfiguration configuration);
+    
+    /// <summary>
+    /// Configures the middleware and request pipeline for the module.
+    /// </summary>
+    /// <param name="app">The application builder to configure the request pipeline.</param>
+    void ConfigureApplication(IApplicationBuilder app);
+    
+    /// <summary>
+    /// Registers any module-specific mappings, such as AutoMapper profiles.
+    /// </summary>
+    void RegisterMappings();
+    
+    /// <summary>
+    /// Gets the name of the module for logging and diagnostics.
+    /// </summary>
+    string Name { get; }
+    
+    /// <summary>
+    /// Gets the priority of the module for ordering. Lower numbers load first.
+    /// </summary>
+    int Order { get; }
+    
+    /// <summary>
+    /// Determines whether the module is enabled based on the configuration.
+    /// </summary>
+    /// <param name="configuration">The application configuration.</param>
+    /// <returns>True if the module is enabled; otherwise, false.</returns>
+    bool IsEnabled(IConfiguration configuration);
+}

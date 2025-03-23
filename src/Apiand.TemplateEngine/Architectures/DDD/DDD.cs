@@ -90,7 +90,7 @@ public sealed class DDD : ArchitectureType
             throw new InvalidOperationException("Invalid flow");
 
         var result = new Dictionary<string, string>();
-        if (!_variants.Any())
+        if (_variants.Count == 0)
             return result;
 
         result[Layer.Application.Humanize()] = GetMatchingVariantPath(Layer.Application, config.Application);
@@ -103,9 +103,9 @@ public sealed class DDD : ArchitectureType
 
     private string GetMatchingVariantPath(Layer layer, Option? option)
     {
-        var match = _variants.FirstOrDefault(v => v.Layer == layer && v.Option == option);
-        if (match == null)
-            match = _variants.FirstOrDefault(v => v.Layer == layer && v.IsDefault);
+        var match = 
+            _variants.FirstOrDefault(v => v.Layer == layer && v.Option == option) ??
+            _variants.FirstOrDefault(v => v.Layer == layer && v.IsDefault);
 
         return match!.BasePath;
     }
