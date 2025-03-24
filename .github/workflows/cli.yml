@@ -2,8 +2,6 @@ name: Build and Publish CLI
 
 on:
   push:
-    tags:
-      - 'cli-v*'
     branches:
       - master
   pull_request:
