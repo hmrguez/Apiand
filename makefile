@@ -51,7 +51,7 @@ api:
                		--output $(PLAYGROUND_DIR)/SimpleApi \
                		--name "SimpleApi" \
                		--architecture DDD \
-               		--api-type Rest \
+               		--api-type Fast-Endpoints \
                		--db-type Mongo-D-B
                		
 # Demo and reinstall

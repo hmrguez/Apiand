@@ -1,1 +1,0 @@
-This is the base for the graphql .cs

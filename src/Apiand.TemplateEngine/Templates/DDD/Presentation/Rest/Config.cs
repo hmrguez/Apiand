@@ -1,1 +1,0 @@
-Configuration for graphql.cs
