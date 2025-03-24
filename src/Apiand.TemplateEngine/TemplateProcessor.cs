@@ -16,7 +16,7 @@ public class TemplateProcessor
         {
             var metadata = ReadTemplateMetadata(templatePath);
         
-            string moduleOutputPath = Path.Combine(outputPath, module);
+            string moduleOutputPath = Path.Combine(outputPath, $"{data["name"]}.{module}");
             
             Directory.CreateDirectory(moduleOutputPath);
             

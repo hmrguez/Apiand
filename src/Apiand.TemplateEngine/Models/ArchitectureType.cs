@@ -10,4 +10,5 @@ public abstract class ArchitectureType
     public abstract TemplateConfiguration BuildConfig(CommandOptions commandOptions);
     public abstract ValidationResult Validate(TemplateConfiguration configuration);
     public abstract Dictionary<string, string> Resolve(TemplateConfiguration configuration);
+    public abstract void ExecutePostCreationCommands(string outputPath, string projectName);
 }

@@ -3,8 +3,8 @@ namespace Apiand.TemplateEngine.Architectures.DDD;
 public enum Option
 {
     Default,
-    Rest,
-    MongoDB
+    FastEndpoints,
+    MongoDB,
 }
 
 public static class DddOptions
@@ -13,7 +13,7 @@ public static class DddOptions
     {
         { Layer.Application, [Option.Default] },
         { Layer.Domain, [Option.Default] },
-        { Layer.Presentation, [Option.Default, Option.Rest] },
+        { Layer.Presentation, [Option.Default, Option.FastEndpoints] },
         { Layer.Infrastructure, [Option.Default, Option.MongoDB] }
     };
 

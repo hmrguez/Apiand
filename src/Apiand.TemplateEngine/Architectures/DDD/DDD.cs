@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Apiand.TemplateEngine.Models;
 using Apiand.TemplateEngine.Utils;
 
@@ -92,7 +93,7 @@ public sealed class DDD : ArchitectureType
         var result = new Dictionary<string, string>();
         if (_variants.Count == 0)
             return result;
-
+        
         result[Layer.Application.Humanize()] = GetMatchingVariantPath(Layer.Application, config.Application);
         result[Layer.Domain.Humanize()] = GetMatchingVariantPath(Layer.Domain, config.Domain);
         result[Layer.Infrastructure.Humanize()] = GetMatchingVariantPath(Layer.Infrastructure, config.Infrastructure);
@@ -133,5 +134,91 @@ public sealed class DDD : ArchitectureType
                 isFirstVariantForModule = false;
             }
         }
+    }
+    
+    public override void ExecutePostCreationCommands(string outputPath, string projectName)
+    {
+        // Find all project files
+        var projectFiles = Directory.GetFiles(outputPath, "*.csproj", SearchOption.AllDirectories);
+        
+        // Create mappings for easier reference
+        var projectPaths = new Dictionary<Layer, string>();
+        foreach (var projectFile in projectFiles)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(projectFile);
+            
+            foreach (Layer layer in Enum.GetValues(typeof(Layer)))
+            {
+                string layerName = layer.ToString();
+                // Handle special case for Presentation layer which is typically named as "Api"
+                string searchName = layer == Layer.Presentation ? "Api" : layerName;
+                
+                if (fileName.EndsWith(searchName, StringComparison.OrdinalIgnoreCase))
+                {
+                    projectPaths[layer] = projectFile;
+                    break;
+                }
+            }
+        }
+        
+        // No projects found, nothing to reference
+        if (projectPaths.Count == 0)
+            return;
+        
+        // Add references according to DDD architecture
+        
+        // 1. Application references Domain
+        if (projectPaths.TryGetValue(Layer.Application, out var appProject) && 
+            projectPaths.TryGetValue(Layer.Domain, out var domainProject))
+        {
+            AddProjectReference(outputPath, appProject, domainProject);
+        }
+        
+        // 2. Infrastructure references Domain and Application
+        if (projectPaths.TryGetValue(Layer.Infrastructure, out var infraProject))
+        {
+            if (projectPaths.TryGetValue(Layer.Domain, out var domainProject2))
+            {
+                AddProjectReference(outputPath, infraProject, domainProject2);
+            }
+            
+            if (projectPaths.TryGetValue(Layer.Application, out var appProject2))
+            {
+                AddProjectReference(outputPath, infraProject, appProject2);
+            }
+        }
+        
+        // 3. Presentation (API) references Application and Infrastructure
+        if (projectPaths.TryGetValue(Layer.Presentation, out var apiProject))
+        {
+            if (projectPaths.TryGetValue(Layer.Application, out var appProject3))
+            {
+                AddProjectReference(outputPath, apiProject, appProject3);
+            }
+            
+            if (projectPaths.TryGetValue(Layer.Infrastructure, out var infraProject2))
+            {
+                AddProjectReference(outputPath, apiProject, infraProject2);
+            }
+        }
+    }
+    
+    private void AddProjectReference(string workingDirectory, string sourceProject, string targetProject)
+    {
+        // Convert to relative path
+        string relativePath = Path.GetRelativePath(Path.GetDirectoryName(sourceProject)!, targetProject);
+        
+        var psi = new ProcessStartInfo
+        {
+            FileName = "dotnet",
+            Arguments = $"add \"{sourceProject}\" reference \"{relativePath}\"",
+            WorkingDirectory = workingDirectory,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false
+        };
+    
+        using var process = Process.Start(psi);
+        process?.WaitForExit();
     }
 }
