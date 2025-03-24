@@ -1,5 +1,6 @@
 using System.CommandLine;
 using System.Diagnostics;
+using System.Text.Json;
 using Apiand.TemplateEngine;
 using Apiand.TemplateEngine.Models;
 
@@ -102,6 +103,18 @@ public class NewCommand : Command
         };
     
         _processor.CreateFromTemplateVariants(templatePaths, output, data);
+        
+        var jsonOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            IncludeFields = true,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+        };
+        
+        var json = JsonSerializer.Serialize(config, config.GetType(), jsonOptions);
+        File.WriteAllText(Path.Combine(output, "apiand-config.json"), json);
+        
         
         // Create a new empty solution
         WriteStatusMessage("Creating solution file...");

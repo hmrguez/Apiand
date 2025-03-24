@@ -58,3 +58,8 @@ api:
 .PHONY: demo-reinstall
 demo-reinstall: clean reinstall api
                		
+               		
+# Add service
+.PHONY: add-service
+add-service: demo-reinstall
+	apiand add service User -p $(PLAYGROUND_DIR)/SimpleApi
