@@ -26,7 +26,7 @@ public class NewCommand : Command
 
         // Architecture options
         var architectureOption = new Argument<string>("--architecture",
-            "Architecture type (single-layer, multi-layer, microservices)");
+            "Architecture type (DDD)");
 
         // API options
         var apiTypeOption = new Option<string>("--api-type", "API type (rest, graphql, grpc)");
