@@ -2,6 +2,8 @@ name: Build and Publish Extensions
     
 on:
   push:
+    tags:
+      - 'ext-v*'
     branches:
       - master
   pull_request:
