@@ -17,4 +17,8 @@
     <ItemGroup>
       <ProjectReference Include="..\Apiand.Extensions\Apiand.Extensions.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
+    </ItemGroup>
 </Project>

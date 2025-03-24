@@ -7,7 +7,7 @@ namespace Apiand.TemplateEngine.Architectures.DDD;
 public sealed class DDD : ArchitectureType
 {
     private readonly List<DddTemplateVariant> _variants = [];
-    public override string Name => "DDD";
+    public override string Name => DddUtils.Name;
 
     public override void LoadVariants(string basePath)
     {
@@ -26,6 +26,7 @@ public sealed class DDD : ArchitectureType
         var temp = new DddTemplateConfiguration
         {
             Application = GetOrDefault(commandOptions.Application),
+            ArchName = Name,
             Domain = GetOrDefault(commandOptions.Domain),
             Presentation = GetOrDefault(commandOptions.ApiType),
             Infrastructure = GetOrDefault(commandOptions.DbType),

@@ -1,7 +1,9 @@
 using Apiand.TemplateEngine.Models;
+using Apiand.TemplateEngine.Utils;
 
 namespace Apiand.TemplateEngine.Architectures.DDD;
 
+[Architecture(DddUtils.Name)]
 public class DddTemplateConfiguration: TemplateConfiguration
 {
     public required Option? Application { get; set; }

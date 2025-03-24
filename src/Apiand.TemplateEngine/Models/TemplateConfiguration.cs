@@ -4,4 +4,5 @@ public class TemplateConfiguration
 {
     public required string OutputPath { get; set; }
     public required string ProjectName { get; set; }
+    public required string ArchName { get; set; }
 }
