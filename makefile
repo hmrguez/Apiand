@@ -47,10 +47,9 @@ version:
 # Demo api
 .PHONY: api
 api:
-	apiand new  \
+	apiand new DDD \
                		--output $(PLAYGROUND_DIR)/SimpleApi \
                		--name "SimpleApi" \
-               		--architecture DDD \
                		--api-type Fast-Endpoints \
                		--db-type Mongo-D-B
                		

@@ -25,9 +25,8 @@ public class NewCommand : Command
         nameOption.AddAlias("-n");
 
         // Architecture options
-        var architectureOption = new Option<string>("--architecture",
+        var architectureOption = new Argument<string>("--architecture",
             "Architecture type (single-layer, multi-layer, microservices)");
-        architectureOption.AddAlias("-a");
 
         // API options
         var apiTypeOption = new Option<string>("--api-type", "API type (rest, graphql, grpc)");
@@ -44,20 +43,20 @@ public class NewCommand : Command
         var domainOption = new Option<string>("--domain", "Domain layer type (entityframework, dapper, none)");
         domainOption.AddAlias("-dom");
 
+        AddArgument(architectureOption);
         AddOption(outputOption);
         AddOption(nameOption);
-        AddOption(architectureOption);
         AddOption(apiTypeOption);
         AddOption(dbTypeOption);
         AddOption(applicationOption);
         AddOption(domainOption);
 
-        this.SetHandler(HandleCommand, outputOption, nameOption, architectureOption, apiTypeOption,
+        this.SetHandler(HandleCommand, architectureOption, outputOption, nameOption, apiTypeOption,
             dbTypeOption, applicationOption, domainOption);
     }
 
-    private void HandleCommand(string output, string? name, string architecture, string apiType,
-        string dbType, string? application, string? domain)
+    private void HandleCommand(string architecture, string output, string? name, string? apiType,
+        string? dbType, string? application, string? domain)
     {
         _messenger.WriteStatusMessage("Validating configuration...");
 
