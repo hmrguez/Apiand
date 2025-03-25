@@ -47,7 +47,7 @@ version:
 # Demo api
 .PHONY: api
 api:
-	apiand new DDD \
+	apiand new ddd \
                		--output $(PLAYGROUND_DIR)/SimpleApi \
                		--name "SimpleApi" \
                		--api-type Fast-Endpoints \
