@@ -34,11 +34,6 @@ var modules = AppDomain.CurrentDomain.GetAssemblies()
         module.RegisterMappings();
     }
 
-    builder.Services.ConfigureHttpJsonOptions(options =>
-    {
-        options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
-    });
-
     builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApplicationModule).Assembly));
 
     var config = builder.Configuration;
