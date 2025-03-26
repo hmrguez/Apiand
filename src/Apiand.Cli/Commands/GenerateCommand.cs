@@ -53,6 +53,26 @@ public class GenerateCommand : Command
                 },
                 nameArgument, pathOption, httpMethodOption);
         }
+        else if (commandName == "entity")
+        {
+            var attributesOption = new Option<string>(
+                "--attributes",
+                "Entity attributes in format 'name:type,email:string,status:enum[value1,value2]'");
+            attributesOption.AddAlias("-a");
+            command.AddOption(attributesOption);
+
+            command.SetHandler(
+                (name, path, attributes) =>
+                {
+                    var data = new Dictionary<string, string>();
+                    if (!string.IsNullOrEmpty(attributes))
+                    {
+                        data["attributes"] = attributes;
+                    }
+                    HandleGenerateComponent(name, path, commandName, implementationType, data);
+                },
+                nameArgument, pathOption, attributesOption);
+        }
         else
         {
             command.SetHandler(
@@ -143,13 +163,27 @@ public class GenerateCommand : Command
         {
             name = name.Substring(0, name.Length - typeSuffix.Length);
         }
-
-        // Capitalize first letter
+    
+        // Handle dot-separated format by capitalizing each segment
+        if (name.Contains('.'))
+        {
+            var segments = name.Split('.');
+            for (int i = 0; i < segments.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(segments[i]))
+                {
+                    segments[i] = char.ToUpper(segments[i][0]) + segments[i].Substring(1);
+                }
+            }
+            return string.Join(".", segments);
+        }
+    
+        // Capitalize first letter for simple names
         if (!string.IsNullOrEmpty(name))
         {
             name = char.ToUpper(name[0]) + name.Substring(1);
         }
-
+    
         return name;
     }
 

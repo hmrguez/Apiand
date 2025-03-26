@@ -62,12 +62,17 @@ demo-reinstall: clean reinstall api
 # Add service
 .PHONY: add-service
 add-service: demo-reinstall
-	apiand generate service User -p $(PLAYGROUND_DIR)/$(DEMO_NAME)
+	apiand generate service Orders.User -p $(PLAYGROUND_DIR)/$(DEMO_NAME)
 
 # Add endpoint
 .PHONY: add-endpoint
 add-endpoint: demo-reinstall
 	apiand generate endpoint GetDemo -p $(PLAYGROUND_DIR)/$(DEMO_NAME) --http-method Put
+
+# Add entity
+.PHONY: add-entity
+add-entity: demo-reinstall
+	apiand generate entity orders.Customer -p $(PLAYGROUND_DIR)/$(DEMO_NAME) --attributes "name:string,email:string,status:enum[active,inactive]"
 
 # Verify which performs dotnet restore
 .PHONY: verify
