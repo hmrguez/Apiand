@@ -9,7 +9,7 @@ public class GenerateEntity : IGenerateEntity
 {
     public string ArchName { get; set; } = DddUtils.Name;
 
-    public void Handle(string workingDirectory, string projectDirectory, string argument, 
+    public void Handle(string workingDirectory, string projectDirectory, string argument,
         Dictionary<string, string> extraData,
         TemplateConfiguration configuration, IMessenger messenger)
     {
@@ -53,13 +53,13 @@ public class GenerateEntity : IGenerateEntity
 
         // Generate entity class content
         string entityContent = GenerateEntityClass(className, configuration.ProjectName, subDirPath, attributes);
-        
+
         // Write the entity file
         string entityPath = Path.Combine(entityDir, $"{className}.cs");
         File.WriteAllText(entityPath, entityContent);
 
         messenger.WriteStatusMessage($"Created entity at {Path.GetRelativePath(projectDirectory, entityPath)}");
-        
+
         // Generate enums if needed
         foreach (var enumAttribute in attributes.Where(a => a.Type.StartsWith("enum[")))
         {
@@ -74,8 +74,8 @@ public class GenerateEntity : IGenerateEntity
     private List<EntityAttribute> ParseAttributes(string attributesString)
     {
         var attributes = new List<EntityAttribute>();
-        var attributePairs = attributesString.Split(',', StringSplitOptions.RemoveEmptyEntries);
-        
+        var attributePairs = attributesString.Split(';', StringSplitOptions.RemoveEmptyEntries);
+
         foreach (var pair in attributePairs)
         {
             var parts = pair.Trim().Split(':', 2);
@@ -83,11 +83,29 @@ public class GenerateEntity : IGenerateEntity
             {
                 string name = parts[0].Trim();
                 string type = parts[1].Trim();
-                
-                attributes.Add(new EntityAttribute { Name = name, Type = type });
+
+                // Extract enum values if it's an enum type
+                List<string> enumValues = new List<string>();
+                if (type.StartsWith("enum[") && type.EndsWith("]"))
+                {
+                    // Parse enum values from format: enum[value1,value2,value3]
+                    var enumValueMatch = Regex.Match(type, @"enum\[(.*)\]");
+                    if (enumValueMatch.Success)
+                    {
+                        string valuesStr = enumValueMatch.Groups[1].Value;
+                        enumValues = valuesStr.Split(',').Select(v => v.Trim()).ToList();
+                    }
+                }
+
+                attributes.Add(new EntityAttribute 
+                { 
+                    Name = name, 
+                    Type = type,
+                    EnumValues = enumValues
+                });
             }
         }
-        
+
         return attributes;
     }
 
@@ -95,28 +113,23 @@ public class GenerateEntity : IGenerateEntity
     {
         var sb = new StringBuilder();
         string @namespace = $"{projectName}.Domain.Entities{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}";
-
+    
+        sb.AppendLine("using Apiand.Extensions.DDD;");
+        sb.AppendLine();
         sb.AppendLine($"namespace {@namespace};");
         sb.AppendLine();
-        sb.AppendLine($"public class {className}");
+        sb.AppendLine($"public class {className} : Entity");
         sb.AppendLine("{");
-        
-        // Add Id property
-        sb.AppendLine("    public Guid Id { get; set; }");
-        
+    
         // Add all specified attributes
         foreach (var attr in attributes)
         {
             string propertyType = GetPropertyType(attr, className);
             sb.AppendLine($"    public {propertyType} {CapitalizeFirst(attr.Name)} {{ get; set; }}");
         }
-        
-        // Add timestamp properties
-        sb.AppendLine("    public DateTime CreatedAt { get; set; }");
-        sb.AppendLine("    public DateTime? UpdatedAt { get; set; }");
-        
+    
         sb.AppendLine("}");
-        
+    
         return sb.ToString();
     }
 
@@ -130,20 +143,18 @@ public class GenerateEntity : IGenerateEntity
         sb.AppendLine($"public enum {enumName}");
         sb.AppendLine("{");
 
-        // Extract enum values from enum[value1,value2,...] format
-        var match = Regex.Match(attribute.Type, @"enum\[(.*)\]");
-        if (match.Success)
+        // Add enum values with proper formatting
+        if (attribute.EnumValues.Count > 0)
         {
-            string[] values = match.Groups[1].Value.Split(',');
-            for (int i = 0; i < values.Length; i++)
+            for (int i = 0; i < attribute.EnumValues.Count; i++)
             {
-                string value = values[i].Trim();
-                sb.AppendLine($"    {CapitalizeFirst(value)}{(i < values.Length - 1 ? "," : "")}");
+                string value = attribute.EnumValues[i];
+                sb.AppendLine($"    {CapitalizeFirst(value)}{(i < attribute.EnumValues.Count - 1 ? "," : "")}");
             }
         }
-        
+
         sb.AppendLine("}");
-        
+
         return sb.ToString();
     }
 
@@ -154,7 +165,7 @@ public class GenerateEntity : IGenerateEntity
             // For enum types, reference the entity-specific enum
             return $"{entityName}{CapitalizeFirst(attr.Name)}";
         }
-        
+
         return attr.Type.ToLower() switch
         {
             "string" => "string",
@@ -171,12 +182,13 @@ public class GenerateEntity : IGenerateEntity
         };
     }
 
-    private string CapitalizeFirst(string input) => 
+    private string CapitalizeFirst(string input) =>
         input.Length > 0 ? char.ToUpper(input[0]) + input.Substring(1) : input;
 
     private class EntityAttribute
     {
         public string Name { get; set; }
         public string Type { get; set; }
+        public List<string> EnumValues { get; set; } = new List<string>();
     }
 }

@@ -72,7 +72,7 @@ add-endpoint: demo-reinstall
 # Add entity
 .PHONY: add-entity
 add-entity: demo-reinstall
-	apiand generate entity orders.Customer -p $(PLAYGROUND_DIR)/$(DEMO_NAME) --attributes "name:string,email:string,status:enum[active,inactive]"
+	apiand generate entity orders.Customer -p $(PLAYGROUND_DIR)/$(DEMO_NAME) --attributes "name:string;email;string;status:enum[active,inactive]"
 
 # Verify which performs dotnet restore
 .PHONY: verify
