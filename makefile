@@ -64,6 +64,11 @@ demo-reinstall: clean reinstall api
 add-service: demo-reinstall
 	apiand generate service User -p $(PLAYGROUND_DIR)/$(DEMO_NAME)
 
+# Add endpoint
+.PHONY: add-endpoint
+add-endpoint: demo-reinstall
+	apiand generate endpoint GetDemo -p $(PLAYGROUND_DIR)/$(DEMO_NAME) --http-method Put
+
 # Verify which performs dotnet restore
 .PHONY: verify
 verify:

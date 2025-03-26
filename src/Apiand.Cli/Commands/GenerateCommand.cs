@@ -34,19 +34,39 @@ public class GenerateCommand : Command
         pathOption.AddAlias("-p");
         command.AddOption(pathOption);
 
-        command.SetHandler(
-            (name, path) => HandleGenerateComponent(name, path, commandName, implementationType),
-            nameArgument,
-            pathOption);
+        // Add HTTP method option only for endpoint command
+        Option<string>? httpMethodOption = null;
+        if (commandName == "endpoint")
+        {
+            httpMethodOption = new Option<string>(
+                "--http-method",
+                () => "Get",
+                "The HTTP method for the endpoint (Get, Post, Put, Delete, Patch)");
+            httpMethodOption.AddAlias("-m");
+            command.AddOption(httpMethodOption);
+
+            command.SetHandler(
+                (name, path, httpMethod) =>
+                {
+                    var data = new Dictionary<string, string> { ["http-method"] = httpMethod };
+                    HandleGenerateComponent(name, path, commandName, implementationType, data);
+                },
+                nameArgument, pathOption, httpMethodOption);
+        }
+        else
+        {
+            command.SetHandler(
+                (name, path) => HandleGenerateComponent(name, path, commandName, implementationType),
+                nameArgument, pathOption);
+        }
 
         AddCommand(command);
     }
 
     private void HandleGenerateComponent(string componentName, string? path, string componentType,
-        Type implementationType)
+        Type implementationType, Dictionary<string, string>? extraData = null)
     {
         var normalizedName = NormalizeName(componentName, componentType);
-
         _messenger.WriteStatusMessage($"Adding {componentType}: {normalizedName}");
 
         var workingDirectory = string.IsNullOrEmpty(path)
@@ -82,11 +102,9 @@ public class GenerateCommand : Command
         _messenger.WriteStatusMessage($"Creating {componentType} {normalizedName} in project {config.ProjectName}...");
 
         // Create component data
-        var data = new Dictionary<string, string>
-        {
-            ["name"] = normalizedName,
-            ["projectName"] = config.ProjectName
-        };
+        var data = extraData ?? new Dictionary<string, string>();
+        data["name"] = normalizedName;
+        data["projectName"] = config.ProjectName;
 
         var projectDir = Path.GetDirectoryName(configFilePath)!;
 
