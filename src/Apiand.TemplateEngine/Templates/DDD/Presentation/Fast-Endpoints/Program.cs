@@ -1,16 +1,19 @@
-using XXXnameXXX.Api;
 using Apiand.Extensions.Interfaces;
-using XXXnameXXX.Application;
-using XXXnameXXX.Application.DI;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using XXXnameXXX.Application;
 using XXXnameXXX.Infrastructure;
 using XXXnameXXX.Infrastructure.DI;
 
-
 var builder = WebApplication.CreateSlimBuilder(args);
 
-var modules = AppDomain.CurrentDomain.GetAssemblies()
+var assemblies = new[]
+{
+    typeof(ApplicationModule).Assembly,
+    typeof(InfraModule).Assembly
+};
+
+var modules = assemblies
     .SelectMany(a => a.GetTypes())
     .Where(t => typeof(IModule).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
     .Select(t => (IModule)Activator.CreateInstance(t)!)
@@ -20,8 +23,8 @@ var modules = AppDomain.CurrentDomain.GetAssemblies()
 
 {
     builder.Configuration
-        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-        .AddJsonFile("appsettings.secret.json", optional: false, reloadOnChange: true)
+        .AddJsonFile("appsettings.json", false, true)
+        .AddJsonFile("appsettings.secret.json", false, true)
         .AddEnvironmentVariables();
 
     builder.Services
@@ -49,10 +52,7 @@ var app = builder.Build();
     app.UseOpenApi();
     app.UseSwaggerGen();
 
-    foreach (var module in modules)
-    {
-        module.ConfigureApplication(app);
-    }
+    foreach (var module in modules) module.ConfigureApplication(app);
 
     app.Run();
 }

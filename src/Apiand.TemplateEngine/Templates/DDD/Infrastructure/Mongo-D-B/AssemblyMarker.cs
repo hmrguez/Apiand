@@ -1,4 +1,6 @@
+using System.Reflection;
 using Apiand.Extensions.Interfaces;
+using Apiand.Extensions.Service;
 using XXXnameXXX.Infrastructure.DI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -13,10 +15,9 @@ public class InfraModule: IModule
         var connectionString = configuration.GetConnectionString("MongoDb")!;
         var databaseName = configuration["DatabaseName"]!;
         services.AddIdentity(configuration);
+        services.AddServicesWithAttribute(Assembly.GetExecutingAssembly());
         services.AddInfrastructure(connectionString, databaseName);
         services.AddOpenTelemetry(configuration);
-        
-        // Add your services here (DO NOT REMOVE THIS LINE)
     }
 
     public void ConfigureApplication(IApplicationBuilder app)

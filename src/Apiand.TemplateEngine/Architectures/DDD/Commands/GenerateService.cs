@@ -61,9 +61,11 @@ public class GenerateService : IGenerateService
         string implementationContent =
             $$"""
               using {{configuration.ProjectName}}.Application.Services{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
+              using Apiand.Extensions.Service;
 
               namespace {{configuration.ProjectName}}.Infrastructure.Services{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
 
+              [Service]
               public class {{argument}}Service : I{{argument}}Service
               {
                   // TODO: Implement service methods
@@ -96,11 +98,5 @@ public class GenerateService : IGenerateService
 
         messenger.WriteStatusMessage($"Created interface at {Path.GetRelativePath(projectDir, interfacePath)}");
         messenger.WriteStatusMessage($"Created implementation at {Path.GetRelativePath(projectDir, implementationPath)}");
-
-        // After creating interface and implementation files
-        // For DDD architecture, register the service in DI
-        string serviceNamespace =
-            $"{configuration.ProjectName}.Application.Services{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}";
-        RoslynUtils.RegisterServiceInModule(infrastructureProject, serviceClassName, serviceNamespace, messenger);
     }
 }

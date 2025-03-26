@@ -18,6 +18,5 @@ public static class InfrastructureServicesInstaller
         services.AddScoped(typeof(IRepository<>), typeof(MongoRepository<>));
         
         // Add other services here
-        services.AddScoped<IUserService, UserService>();
     }
 }

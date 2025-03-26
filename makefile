@@ -4,6 +4,7 @@ CONFIGURATION = Release
 OUTPUT_DIR = ./nupkg
 PROJECT_DIR = ./src/Apiand.Cli
 PLAYGROUND_DIR = ./.output
+DEMO_NAME = SimpleApi
 
 # Default target
 .PHONY: default
@@ -48,8 +49,8 @@ version:
 .PHONY: api
 api:
 	apiand new ddd \
-               		--output $(PLAYGROUND_DIR)/SimpleApi \
-               		--name "SimpleApi" \
+               		--output $(PLAYGROUND_DIR)/$(DEMO_NAME) \
+               		--name $(DEMO_NAME) \
                		--api-type Fast-Endpoints \
                		--db-type Mongo-D-B
                		
@@ -61,4 +62,9 @@ demo-reinstall: clean reinstall api
 # Add service
 .PHONY: add-service
 add-service: demo-reinstall
-	apiand generate service User -p $(PLAYGROUND_DIR)/SimpleApi
+	apiand generate service User -p $(PLAYGROUND_DIR)/$(DEMO_NAME)
+
+# Verify which performs dotnet restore
+.PHONY: verify
+verify:
+	dotnet build $(PLAYGROUND_DIR)/$(DEMO_NAME)

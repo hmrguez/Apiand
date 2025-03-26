@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Apiand.Extensions.Service;
 using XXXnameXXX.Application.Contracts;
 using XXXnameXXX.Application.Identity.Dtos;
 using XXXnameXXX.Application.Identity.Services;
@@ -11,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace XXXnameXXX.Infrastructure.Identity;
 
+[Service]
 public class UserService(IRepository<User> repository, IPasswordHasher<User> passwordHasher, IConfiguration configuration): IUserService
 {
     public Task AddAsync(User user)
