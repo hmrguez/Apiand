@@ -77,20 +77,22 @@ public static class ArchitectureTypeFactory
     }
     
     
-    public static T? GetCommandImplementations<T>(string architectureName) where T : ICommandSpecification
+    public static ICommandSpecification GetCommandImplementation(Type interfaceType, string architectureName)
     {
-        var t = typeof(T);
-        
-        // Get all types from the executing assembly that implement IAddService
+        if (!typeof(ICommandSpecification).IsAssignableFrom(interfaceType))
+            return null;
+    
+        // Get all types that implement the specified interface
         var implementations = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(assembly => assembly.GetTypes()
-                .Where(type => t.IsAssignableFrom(type) && 
-                              !type.IsInterface && 
-                              !type.IsAbstract))
-            .Select(type => (T)Activator.CreateInstance(type)!)
+                .Where(type => interfaceType.IsAssignableFrom(type) && 
+                               !type.IsInterface && 
+                               !type.IsAbstract))
+            .Select(type => (ICommandSpecification)Activator.CreateInstance(type))
             .Where(instance => instance != null && 
-                   string.Equals(instance.ArchName, architectureName, StringComparison.OrdinalIgnoreCase));
-        
+                               instance is { } commandSpec &&
+                               string.Equals(commandSpec.ArchName, architectureName, StringComparison.OrdinalIgnoreCase));
+    
         return implementations.FirstOrDefault();
     }
 }

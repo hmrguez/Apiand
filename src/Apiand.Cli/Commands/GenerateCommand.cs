@@ -17,30 +17,37 @@ public class GenerateCommand : Command
         _processor = new TemplateProcessor();
         _messenger = new ConsoleMessenger();
 
-        // Create the service subcommand
-        var serviceCommand = new Command("service", "Add a new service to the project");
-
-        // Add a required argument for the service name
-        var serviceNameArgument = new Argument<string>("name", "The name of the service to create");
-        serviceCommand.AddArgument(serviceNameArgument);
-
-        var pathOption = new Option<string>("--path", "The path to add the service to");
-        pathOption.AddAlias("-p");
-
-        serviceCommand.SetHandler(HandleAddService, serviceNameArgument, pathOption);
-
-        // Add the service subcommand to the add command
-        serviceCommand.AddOption(pathOption);
-        AddCommand(serviceCommand);
-
-        // In the future, you can add more subcommands like "endpoint", etc.
+        RegisterComponentGenerator("service", "Add a new service to the project", typeof(IGenerateService));
+        RegisterComponentGenerator("endpoint", "Add a new endpoint to the project", typeof(IGenerateEndpoint));
+        RegisterComponentGenerator("entity", "Add a new entity to the project", typeof(IGenerateEntity));
     }
 
-    private void HandleAddService(string serviceName, string? path)
+    private void RegisterComponentGenerator(string commandName, string description, Type implementationType)
     {
-        var normalizedName = NormalizeServiceName(serviceName);
+        var command = new Command(commandName, description);
 
-        _messenger.WriteStatusMessage($"Adding service: {normalizedName}");
+        // Add a required argument for the component name
+        var nameArgument = new Argument<string>("name", $"The name of the {commandName} to create");
+        command.AddArgument(nameArgument);
+
+        var pathOption = new Option<string>("--path", $"The path to add the {commandName} to");
+        pathOption.AddAlias("-p");
+        command.AddOption(pathOption);
+
+        command.SetHandler(
+            (name, path) => HandleGenerateComponent(name, path, commandName, implementationType),
+            nameArgument,
+            pathOption);
+
+        AddCommand(command);
+    }
+
+    private void HandleGenerateComponent(string componentName, string? path, string componentType,
+        Type implementationType)
+    {
+        var normalizedName = NormalizeName(componentName, componentType);
+
+        _messenger.WriteStatusMessage($"Adding {componentType}: {normalizedName}");
 
         var workingDirectory = string.IsNullOrEmpty(path)
             ? Directory.GetCurrentDirectory()
@@ -72,9 +79,9 @@ public class GenerateCommand : Command
             return;
         }
 
-        _messenger.WriteStatusMessage($"Creating service {normalizedName} in project {config.ProjectName}...");
+        _messenger.WriteStatusMessage($"Creating {componentType} {normalizedName} in project {config.ProjectName}...");
 
-        // Create service data
+        // Create component data
         var data = new Dictionary<string, string>
         {
             ["name"] = normalizedName,
@@ -83,10 +90,12 @@ public class GenerateCommand : Command
 
         var projectDir = Path.GetDirectoryName(configFilePath)!;
 
-        var serviceImplementation = ArchitectureTypeFactory.GetCommandImplementations<IGenerateService>(config.ArchName);
-        serviceImplementation?.Handle(workingDirectory, projectDir, normalizedName, data, config, _messenger);
+        // Get the appropriate implementation based on component type and architecture
+        var implementation = ArchitectureTypeFactory.GetCommandImplementation(implementationType, config.ArchName);
 
-        _messenger.WriteSuccessMessage($"Service {normalizedName} added successfully!");
+        implementation.Handle(workingDirectory, projectDir, normalizedName, data, config, _messenger);
+        _messenger.WriteSuccessMessage(
+            $"{char.ToUpper(componentType[0])}{componentType.Substring(1)} {normalizedName} added successfully!");
     }
 
     private string FindConfigFile(string startingDirectory)
@@ -108,15 +117,20 @@ public class GenerateCommand : Command
         return configFile;
     }
 
-    private string NormalizeServiceName(string serviceName)
+    private string NormalizeName(string name, string componentType)
     {
-        // Remove "Service" suffix if present, we'll add it back consistently
-        var name = serviceName.EndsWith("Service", StringComparison.OrdinalIgnoreCase)
-            ? serviceName.Substring(0, serviceName.Length - 7)
-            : serviceName;
+        // Remove type suffix if present (e.g., "UserService" -> "User" when component type is "service")
+        var typeSuffix = componentType.Substring(0, 1).ToUpper() + componentType.Substring(1);
+        if (name.EndsWith(typeSuffix, StringComparison.OrdinalIgnoreCase))
+        {
+            name = name.Substring(0, name.Length - typeSuffix.Length);
+        }
 
         // Capitalize first letter
-        if (!string.IsNullOrEmpty(name)) name = char.ToUpper(name[0]) + name.Substring(1);
+        if (!string.IsNullOrEmpty(name))
+        {
+            name = char.ToUpper(name[0]) + name.Substring(1);
+        }
 
         return name;
     }
