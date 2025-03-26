@@ -1,26 +1,18 @@
 using System.CommandLine;
-using System.IO;
 using System.Text.Json;
-using Apiand.TemplateEngine;
-using Apiand.TemplateEngine.Architectures.DDD;
-using Apiand.TemplateEngine.Models;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using Apiand.Cli.Utils;
+using Apiand.TemplateEngine;
+using Apiand.TemplateEngine.Models;
 using Apiand.TemplateEngine.Models.Commands;
 
 namespace Apiand.Cli.Commands;
 
-public class AddCommand : Command
+public class GenerateCommand : Command
 {
-    private readonly TemplateProcessor _processor;
     private readonly IMessenger _messenger;
+    private readonly TemplateProcessor _processor;
 
-    public AddCommand() : base("add", "Add components to an existing project")
+    public GenerateCommand() : base("generate", "Add components to an existing project")
     {
         _processor = new TemplateProcessor();
         _messenger = new ConsoleMessenger();
@@ -46,11 +38,11 @@ public class AddCommand : Command
 
     private void HandleAddService(string serviceName, string? path)
     {
-        string normalizedName = NormalizeServiceName(serviceName);
+        var normalizedName = NormalizeServiceName(serviceName);
 
         _messenger.WriteStatusMessage($"Adding service: {normalizedName}");
 
-        string workingDirectory = string.IsNullOrEmpty(path)
+        var workingDirectory = string.IsNullOrEmpty(path)
             ? Directory.GetCurrentDirectory()
             : Path.GetFullPath(path);
 
@@ -62,7 +54,7 @@ public class AddCommand : Command
         }
 
         // Find configuration file starting from the working directory
-        string configFilePath = FindConfigFile(workingDirectory);
+        var configFilePath = FindConfigFile(workingDirectory);
         if (string.IsNullOrEmpty(configFilePath))
         {
             _messenger.WriteErrorMessage(
@@ -88,10 +80,10 @@ public class AddCommand : Command
             ["name"] = normalizedName,
             ["projectName"] = config.ProjectName
         };
-        
-        string projectDir = Path.GetDirectoryName(configFilePath)!;
 
-        var serviceImplementation = ArchitectureTypeFactory.GetCommandImplementations<IAddService>(config.ArchName);
+        var projectDir = Path.GetDirectoryName(configFilePath)!;
+
+        var serviceImplementation = ArchitectureTypeFactory.GetCommandImplementations<IGenerateService>(config.ArchName);
         serviceImplementation?.Handle(workingDirectory, projectDir, normalizedName, data, config, _messenger);
 
         _messenger.WriteSuccessMessage($"Service {normalizedName} added successfully!");
@@ -100,12 +92,12 @@ public class AddCommand : Command
     private string FindConfigFile(string startingDirectory)
     {
         // Start from specified directory and look up for apiand-config.json
-        string currentDir = startingDirectory;
-        string configFile = Path.Combine(currentDir, "apiand-config.json");
+        var currentDir = startingDirectory;
+        var configFile = Path.Combine(currentDir, "apiand-config.json");
 
         while (!File.Exists(configFile))
         {
-            string parentDir = Directory.GetParent(currentDir)?.FullName;
+            var parentDir = Directory.GetParent(currentDir)?.FullName;
             if (parentDir == null || parentDir == currentDir)
                 return string.Empty;
 
@@ -119,15 +111,12 @@ public class AddCommand : Command
     private string NormalizeServiceName(string serviceName)
     {
         // Remove "Service" suffix if present, we'll add it back consistently
-        string name = serviceName.EndsWith("Service", StringComparison.OrdinalIgnoreCase)
+        var name = serviceName.EndsWith("Service", StringComparison.OrdinalIgnoreCase)
             ? serviceName.Substring(0, serviceName.Length - 7)
             : serviceName;
 
         // Capitalize first letter
-        if (!string.IsNullOrEmpty(name))
-        {
-            name = char.ToUpper(name[0]) + name.Substring(1);
-        }
+        if (!string.IsNullOrEmpty(name)) name = char.ToUpper(name[0]) + name.Substring(1);
 
         return name;
     }
@@ -136,12 +125,12 @@ public class AddCommand : Command
     {
         try
         {
-            string jsonContent = File.ReadAllText(configPath);
+            var jsonContent = File.ReadAllText(configPath);
             var t = JsonSerializer.Deserialize<T>(jsonContent,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             if (t != null) return t;
-            
+
             return JsonSerializer.Deserialize<TemplateConfiguration>(jsonContent,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
         }

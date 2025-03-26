@@ -4,7 +4,7 @@ using Apiand.TemplateEngine.Utils;
 
 namespace Apiand.TemplateEngine.Architectures.DDD.Commands;
 
-public class AddService : IAddService
+public class GenerateService : IGenerateService
 {
     public string ArchName { get; set; } = DddUtils.Name;
 
