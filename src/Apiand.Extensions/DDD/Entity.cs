@@ -30,7 +30,6 @@ public abstract class Entity
 
     public override int GetHashCode() => Id.GetHashCode();
     
-    // == and != operators
     public static bool operator ==(Entity? a, Entity? b)
     {
         if (a is null && b is null)

@@ -19,6 +19,8 @@ dotnet add package Apiand.Extensions
 
 ## Usage
 
+The utilities contain include and are not limited to the following:
+
 ### Service Attribute Registration
 
 Easily register services with their interfaces using attributes:
@@ -31,7 +33,7 @@ public class UserService : IUserService
     // Implementation
 }
 
-// In your startup or module
+// In your startup or module, only once
 services.AddServicesWithAttribute(typeof(YourClassInAssembly).Assembly);
 ```
 

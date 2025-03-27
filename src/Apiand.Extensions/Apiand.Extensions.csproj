@@ -26,8 +26,4 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Attributes\" />
-    </ItemGroup>
-
 </Project>
