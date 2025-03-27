@@ -7,7 +7,7 @@
 
         <!-- NuGet package properties -->
         <PackageId>Apiand.Extensions</PackageId>
-        <Version>0.0.5</Version>
+        <Version>0.0.6</Version>
         <Authors>hmrguez</Authors>
         <Company>Apiand</Company>
         <Description>A library for common models for the Apiand framework</Description>
