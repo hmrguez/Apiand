@@ -1,9 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Apiand.TemplateEngine.Utils;
+namespace Apiand.Extensions.Utils;
+
+
+public enum EnumHumanizingOptions
+{
+    Default,
+    CapitalizeHyphen
+}
 
 public static class EnumUtils
 {
@@ -11,10 +15,18 @@ public static class EnumUtils
     /// Converts an enum value to a human-readable string (e.g., MultiLayer becomes "multi-layer")
     /// </summary>
     /// <param name="value">The enum value to humanize</param>
+    /// <param name="options">How to humanize the enum:
+    /// <br></br>
+    /// <b>Default</b> uses the enum name
+    /// <br></br>
+    /// <b>CapitalizeHyphen</b> replaces upper case letters with a hyphen and the same upper case letter 
+    /// </param>
     /// <returns>A human-readable string representation</returns>
-    public static string Humanize(this Enum value)
+    public static string Humanize(this Enum value, EnumHumanizingOptions options = EnumHumanizingOptions.Default)
     {
         string name = value.ToString();
+        if (options == EnumHumanizingOptions.Default)
+            return name;
 
         // Add a space before each capital letter and make it lowercase
         string result = Regex.Replace(name, "([A-Z])", " $1").Trim();
@@ -28,22 +40,33 @@ public static class EnumUtils
     /// </summary>
     /// <typeparam name="T">The enum type</typeparam>
     /// <param name="humanizedString">The humanized string (e.g., "multi-layer")</param>
+    /// /// <param name="options">How to humanize the enum:
+    /// <br></br>
+    /// <b>Default</b>: uses the enum name
+    /// <br></br>
+    /// <b>CapitalizeHyphen</b>: replaces upper case letters with a hyphen and the same upper case letter 
+    /// </param>
     /// <returns>The corresponding enum value, or null if conversion fails</returns>
-    public static T? Dehumanize<T>(this string humanizedString) where T : struct, Enum
+    public static T? Dehumanize<T>(this string humanizedString, EnumHumanizingOptions options = EnumHumanizingOptions.Default) where T : struct, Enum
     {
         if (string.IsNullOrEmpty(humanizedString))
             return null;
 
-        // Replace hyphens with spaces
-        string spacedString = humanizedString.Replace("-", " ");
+        string toUse = humanizedString;
 
-        // Convert to title case (first letter of each word capitalized)
-        string pascalCase = System.Globalization.CultureInfo.CurrentCulture.TextInfo
-            .ToTitleCase(spacedString)
-            .Replace(" ", ""); // Remove spaces
+        if (options == EnumHumanizingOptions.CapitalizeHyphen)
+        {
+            // Replace hyphens with spaces
+            string spacedString = humanizedString.Replace("-", " ");
+
+            // Convert to title case (first letter of each word capitalized)
+            toUse = System.Globalization.CultureInfo.CurrentCulture.TextInfo
+                .ToTitleCase(spacedString)
+                .Replace(" ", ""); // Remove spaces
+        }
 
         // Try to parse the string to the enum type
-        if (Enum.TryParse<T>(pascalCase, out T result))
+        if (Enum.TryParse<T>(toUse, out T result))
             return result;
 
         return null;

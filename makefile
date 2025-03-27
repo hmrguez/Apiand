@@ -51,8 +51,8 @@ api:
 	apiand new ddd \
                		--output $(PLAYGROUND_DIR)/$(DEMO_NAME) \
                		--name $(DEMO_NAME) \
-               		--api-type Fast-Endpoints \
-               		--db-type Mongo-D-B
+               		--api-type FastEndpoints \
+               		--db-type MongoDB
                		
 # Demo and reinstall
 .PHONY: demo-reinstall
