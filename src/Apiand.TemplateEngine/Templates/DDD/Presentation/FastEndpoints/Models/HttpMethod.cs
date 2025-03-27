@@ -1,4 +1,4 @@
-namespace XXXnameXXX.Api.Models;
+namespace XXXnameXXX.Presentation.Models;
 
 public enum HttpMethod
 {

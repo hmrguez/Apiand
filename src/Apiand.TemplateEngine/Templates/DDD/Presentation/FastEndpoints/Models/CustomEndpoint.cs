@@ -3,7 +3,7 @@ using Apiand.Extensions.Models;
 using FastEndpoints;
 using MediatR;
 
-namespace XXXnameXXX.Api.Models;
+namespace XXXnameXXX.Presentation.Models;
 
 public abstract class CustomEndpoint<TRequest, TResult>(IMediator mediator) : Endpoint<TRequest, Result<TResult>>
     where TRequest : IRequest<Result<TResult>>

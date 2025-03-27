@@ -117,9 +117,9 @@ public class GenerateEndpoint : IGenerateEndpoint
               using {{configuration.ProjectName}}.Application.{{(isQuery ? "Queries" : "Commands")}}{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}}.{{endpointClassName}};
               using {{configuration.ProjectName}}.Application.Dtos{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
               using MediatR;
-              using {{configuration.ProjectName}}.Api.Models;
+              using {{configuration.ProjectName}}.Presentation.Models;
 
-              namespace {{configuration.ProjectName}}.Api.Endpoints{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
+              namespace {{configuration.ProjectName}}.Presentation.Endpoints{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
 
               public class {{endpointClassName}}Endpoint(IMediator mediator) : CustomEndpoint<{{requestTypeName}}, {{endpointClassName}}Response>(mediator)
               {
