@@ -58,7 +58,13 @@ api:
 # Demo and reinstall
 .PHONY: demo-reinstall
 demo-reinstall: clean reinstall api
-               		
+
+# DEMO and reinstall single layer
+.PHONY: demo-reinstall-single-layer
+demo-reinstall-single-layer: clean reinstall
+	apiand new single-layer \
+			   		--output $(PLAYGROUND_DIR)/$(DEMO_NAME) \
+			   		--name $(DEMO_NAME) \
                		
 # Add service
 .PHONY: add-service

@@ -26,6 +26,7 @@ public class NewCommand : Command
     private void RegisterSubcommands()
     {
         AddCommand(new NewDddCommand());
+        AddCommand(new NewSingleLayer());
     }
 
     protected void HandleArchCommand(ArchitectureType arch, CommandOptions commandOptions)
