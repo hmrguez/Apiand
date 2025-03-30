@@ -3,11 +3,11 @@ using Apiand.TemplateEngine.Models;
 using Apiand.TemplateEngine.Models.Commands;
 using Apiand.TemplateEngine.Utils;
 
-namespace Apiand.TemplateEngine.Architectures.DDD.Commands;
+namespace Apiand.TemplateEngine.Architectures.Standalone.Commands;
 
 public class GenerateService : IGenerateService
 {
-    public string ArchName { get; set; } = DddUtils.Name;
+    public string ArchName { get; set; } = StandaloneUtils.Name;
 
     public Result Handle(string workingDirectory, string projectDir, string argument,
         Dictionary<string, string> extraData,
@@ -20,32 +20,32 @@ public class GenerateService : IGenerateService
         string serviceClassName = nameParts[^1]; // Last part is the actual service name
         string subDirPath = string.Join("/", nameParts.Take(nameParts.Length - 1));
 
-        // Find the appropriate projects for interface and implementation
+        // Find the main project
+        string mainProject = null;
 
-        string applicationProject = null;
-        string infrastructureProject = null;
-
-        // For DDD architecture, find Application and Infrastructure projects
+        // For SingleLayer architecture, find the main project
         var projectFiles = Directory.GetFiles(projectDir, "*.csproj", SearchOption.AllDirectories);
 
+        // Get the first project file or the one matching the configuration project name
         foreach (var projectFile in projectFiles)
         {
             string projectFileName = Path.GetFileNameWithoutExtension(projectFile);
-            if (projectFileName.EndsWith("Application"))
+            if (projectFileName.Equals(configuration.ProjectName, StringComparison.OrdinalIgnoreCase))
             {
-                applicationProject = Path.GetDirectoryName(projectFile);
+                mainProject = Path.GetDirectoryName(projectFile);
+                break;
             }
-            else if (projectFileName.EndsWith("Infrastructure"))
+            
+            // If no specific match, just pick the first one
+            if (mainProject == null)
             {
-                infrastructureProject = Path.GetDirectoryName(projectFile);
+                mainProject = Path.GetDirectoryName(projectFile);
             }
         }
 
-        if (applicationProject == null || infrastructureProject == null)
+        if (mainProject == null)
         {
-            messenger.WriteErrorMessage(
-                "Could not find required Application and Infrastructure projects in DDD architecture.");
-            return Result.Fail(TemplatingErrors.ApplicationInfrastructureProjectsNotFound);
+            return Result.Fail(TemplatingErrors.ProjectNotFound);
         }
 
         // Generate content using CodeBlocks
@@ -60,14 +60,11 @@ public class GenerateService : IGenerateService
             subDirPath);
 
         // Create directories and files
-        string interfaceDir = Path.Combine(applicationProject, "Services", subDirPath);
-        string implementationDir = Path.Combine(infrastructureProject, "Services", subDirPath);
+        string servicesDir = Path.Combine(mainProject, "Services", subDirPath);
+        Directory.CreateDirectory(servicesDir);
 
-        Directory.CreateDirectory(interfaceDir);
-        Directory.CreateDirectory(implementationDir);
-
-        string interfacePath = Path.Combine(interfaceDir, $"I{serviceClassName}Service.cs");
-        string implementationPath = Path.Combine(implementationDir, $"{serviceClassName}Service.cs");
+        string interfacePath = Path.Combine(servicesDir, $"I{serviceClassName}Service.cs");
+        string implementationPath = Path.Combine(servicesDir, $"{serviceClassName}Service.cs");
 
         // Write files
         File.WriteAllText(interfacePath, interfaceContent);
@@ -75,7 +72,7 @@ public class GenerateService : IGenerateService
 
         messenger.WriteStatusMessage($"Created interface at {Path.GetRelativePath(projectDir, interfacePath)}");
         messenger.WriteStatusMessage($"Created implementation at {Path.GetRelativePath(projectDir, implementationPath)}");
-        
+
         return Result.Succeed();
     }
 }

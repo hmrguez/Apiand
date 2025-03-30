@@ -1,3 +1,4 @@
+using Apiand.Extensions.Models;
 using Apiand.TemplateEngine.Models;
 using Apiand.TemplateEngine.Models.Commands;
 using Apiand.TemplateEngine.Utils;
@@ -8,7 +9,7 @@ public class GenerateEndpoint : IGenerateEndpoint
 {
     public string ArchName { get; set; } = DddUtils.Name;
 
-    public void Handle(string workingDirectory, string projectDirectory, string argument,
+    public Result Handle(string workingDirectory, string projectDirectory, string argument,
         Dictionary<string, string> extraData,
         TemplateConfiguration configuration, IMessenger messenger)
     {
@@ -50,7 +51,7 @@ public class GenerateEndpoint : IGenerateEndpoint
         {
             messenger.WriteErrorMessage(
                 "Could not find required API/Presentation and Application projects in DDD architecture.");
-            return;
+            return Result.Fail(TemplatingErrors.ApiApplicationProjectsNotFound);
         }
 
         // Create directories
@@ -92,5 +93,7 @@ public class GenerateEndpoint : IGenerateEndpoint
         messenger.WriteStatusMessage($"Created handler at {Path.GetRelativePath(projectDirectory, handlerPath)}");
         messenger.WriteStatusMessage($"Created response DTO at {Path.GetRelativePath(projectDirectory, responsePath)}");
         messenger.WriteStatusMessage($"Created endpoint at {Path.GetRelativePath(projectDirectory, endpointPath)}");
+
+        return Result.Succeed();
     }
 }

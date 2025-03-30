@@ -1,14 +1,13 @@
+using Apiand.Extensions.Models;
 using Apiand.TemplateEngine.Models;
 using Apiand.TemplateEngine.Models.Commands;
 using Apiand.TemplateEngine.Utils;
-using System.Text;
-using Apiand.Extensions.Models;
 
-namespace Apiand.TemplateEngine.Architectures.DDD.Commands;
+namespace Apiand.TemplateEngine.Architectures.Standalone.Commands;
 
 public class GenerateEntity : IGenerateEntity
 {
-    public string ArchName { get; set; } = DddUtils.Name;
+    public string ArchName { get; set; } = StandaloneUtils.Name;
 
     public Result Handle(string workingDirectory, string projectDirectory, string argument,
         Dictionary<string, string> extraData,
@@ -21,28 +20,34 @@ public class GenerateEntity : IGenerateEntity
         string className = nameParts[^1]; // Last part is the actual entity name
         string subDirPath = string.Join("/", nameParts.Take(nameParts.Length - 1));
 
-        // Find the Domain project
-        string domainProject = null;
+        // Find the main project
+        string mainProject = null;
         var projectFiles = Directory.GetFiles(projectDirectory, "*.csproj", SearchOption.AllDirectories);
 
+        // Get the first project file or the one matching the configuration project name
         foreach (var projectFile in projectFiles)
         {
             string projectFileName = Path.GetFileNameWithoutExtension(projectFile);
-            if (projectFileName.EndsWith("Domain"))
+            if (projectFileName.Equals(configuration.ProjectName, StringComparison.OrdinalIgnoreCase))
             {
-                domainProject = Path.GetDirectoryName(projectFile);
+                mainProject = Path.GetDirectoryName(projectFile);
                 break;
+            }
+            
+            // If no specific match, just pick the first one
+            if (mainProject == null)
+            {
+                mainProject = Path.GetDirectoryName(projectFile);
             }
         }
 
-        if (domainProject == null)
+        if (mainProject == null)
         {
-            messenger.WriteErrorMessage("Could not find Domain project in DDD architecture.");
-            return Result.Fail(TemplatingErrors.DomainProjectNotFound);
+            return Result.Fail(TemplatingErrors.ProjectNotFound);
         }
 
         // Create entity directory
-        string entityDir = Path.Combine(domainProject, "Entities", subDirPath);
+        string entityDir = Path.Combine(mainProject, "Entities", subDirPath);
         Directory.CreateDirectory(entityDir);
 
         // Parse attributes if provided
@@ -86,7 +91,7 @@ public class GenerateEntity : IGenerateEntity
             File.WriteAllText(enumPath, enumContent);
             messenger.WriteStatusMessage($"Created enum at {Path.GetRelativePath(projectDirectory, enumPath)}");
         }
-        
+
         return Result.Succeed();
     }
 }

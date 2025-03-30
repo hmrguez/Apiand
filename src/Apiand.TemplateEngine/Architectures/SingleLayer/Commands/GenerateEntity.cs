@@ -2,6 +2,7 @@ using Apiand.TemplateEngine.Models;
 using Apiand.TemplateEngine.Models.Commands;
 using Apiand.TemplateEngine.Utils;
 using System.Text;
+using Apiand.Extensions.Models;
 
 namespace Apiand.TemplateEngine.Architectures.SingleLayer.Commands;
 
@@ -9,7 +10,7 @@ public class GenerateEntity : IGenerateEntity
 {
     public string ArchName { get; set; } = SingleLayerUtils.Name;
 
-    public void Handle(string workingDirectory, string projectDirectory, string argument,
+    public Result Handle(string workingDirectory, string projectDirectory, string argument,
         Dictionary<string, string> extraData,
         TemplateConfiguration configuration, IMessenger messenger)
     {
@@ -43,8 +44,7 @@ public class GenerateEntity : IGenerateEntity
 
         if (mainProject == null)
         {
-            messenger.WriteErrorMessage("Could not find a project in SingleLayer architecture.");
-            return;
+            return Result.Fail(TemplatingErrors.ProjectNotFound);
         }
 
         // Create entity directory
@@ -92,5 +92,7 @@ public class GenerateEntity : IGenerateEntity
             File.WriteAllText(enumPath, enumContent);
             messenger.WriteStatusMessage($"Created enum at {Path.GetRelativePath(projectDirectory, enumPath)}");
         }
+        
+        return Result.Succeed();
     }
 }

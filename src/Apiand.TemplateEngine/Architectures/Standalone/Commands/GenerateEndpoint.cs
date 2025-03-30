@@ -1,16 +1,12 @@
+using Apiand.Extensions.Models;
 using Apiand.TemplateEngine.Models;
 using Apiand.TemplateEngine.Models.Commands;
-using Apiand.TemplateEngine.Utils;
-using System;
-using System.IO;
-using System.Linq;
-using Apiand.Extensions.Models;
 
-namespace Apiand.TemplateEngine.Architectures.SingleLayer.Commands;
+namespace Apiand.TemplateEngine.Architectures.Standalone.Commands;
 
 public class GenerateEndpoint : IGenerateEndpoint
 {
-    public string ArchName { get; set; } = "SingleLayer";
+    public string ArchName { get; set; } = StandaloneUtils.Name;
 
     public Result Handle(string workingDirectory, string projectDirectory, string argument,
         Dictionary<string, string> extraData,
@@ -45,9 +41,6 @@ public class GenerateEndpoint : IGenerateEndpoint
         // Write the endpoint file
         string endpointPath = Path.Combine(endpointsDir, $"{endpointClassName}Endpoint.cs");
         File.WriteAllText(endpointPath, endpointContent);
-
-        messenger.WriteStatusMessage(
-            $"Created {endpointClassName} endpoint at {Path.GetRelativePath(projectDirectory, endpointPath)}");
             
         return Result.Succeed();
     }

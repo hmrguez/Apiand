@@ -30,9 +30,9 @@ public class GenerateCommand : Command
         var nameArgument = new Argument<string>("name", $"The name of the {commandName} to create");
         command.AddArgument(nameArgument);
 
-        var pathOption = new Option<string>("--path", $"The path to add the {commandName} to");
-        pathOption.AddAlias("-p");
-        command.AddOption(pathOption);
+        var outputOption = new Option<string>("--output", $"The path to add the {commandName} to");
+        outputOption.AddAlias("-o");
+        command.AddOption(outputOption);
 
         // Add HTTP method option only for endpoint command
         Option<string>? httpMethodOption = null;
@@ -51,7 +51,7 @@ public class GenerateCommand : Command
                     var data = new Dictionary<string, string> { ["http-method"] = httpMethod };
                     HandleGenerateComponent(name, path, commandName, implementationType, data);
                 },
-                nameArgument, pathOption, httpMethodOption);
+                nameArgument, outputOption, httpMethodOption);
         }
         else if (commandName == "entity")
         {
@@ -71,13 +71,13 @@ public class GenerateCommand : Command
                     }
                     HandleGenerateComponent(name, path, commandName, implementationType, data);
                 },
-                nameArgument, pathOption, attributesOption);
+                nameArgument, outputOption, attributesOption);
         }
         else
         {
             command.SetHandler(
                 (name, path) => HandleGenerateComponent(name, path, commandName, implementationType),
-                nameArgument, pathOption);
+                nameArgument, outputOption);
         }
 
         AddCommand(command);
@@ -130,17 +130,25 @@ public class GenerateCommand : Command
 
         // Get the appropriate implementation based on component type and architecture
         var implementation = ArchitectureTypeFactory.GetCommandImplementation(implementationType, config.ArchName);
-
-        implementation.Handle(workingDirectory, projectDir, normalizedName, data, config, _messenger);
-        _messenger.WriteSuccessMessage(
-            $"{char.ToUpper(componentType[0])}{componentType.Substring(1)} {normalizedName} added successfully!");
+        if(implementation == null)
+        {
+            _messenger.WriteErrorMessage($"No implementation found for generate {componentType} in architecture {config.ArchName}");
+            return;
+        }
+        
+        var result = implementation.Handle(workingDirectory, projectDir, normalizedName, data, config, _messenger);
+        if(result.IsSuccess)
+            _messenger.WriteSuccessMessage(
+                $"{char.ToUpper(componentType[0])}{componentType.Substring(1)} {normalizedName} added successfully!");
+        else
+            _messenger.WriteErrorMessage(result.Error!.Description);
     }
 
     private string FindConfigFile(string startingDirectory)
     {
-        // Start from specified directory and look up for apiand-config.json
+        // Start from specified directory and look up for apiand.config.json
         var currentDir = startingDirectory;
-        var configFile = Path.Combine(currentDir, "apiand-config.json");
+        var configFile = Path.Combine(currentDir, "apiand.config.json");
 
         while (!File.Exists(configFile))
         {
@@ -149,7 +157,7 @@ public class GenerateCommand : Command
                 return string.Empty;
 
             currentDir = parentDir;
-            configFile = Path.Combine(currentDir, "apiand-config.json");
+            configFile = Path.Combine(currentDir, "apiand.config.json");
         }
 
         return configFile;

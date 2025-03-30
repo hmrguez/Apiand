@@ -1,3 +1,4 @@
+using Apiand.Extensions.Models;
 using Apiand.TemplateEngine.Models;
 using Apiand.TemplateEngine.Models.Commands;
 using Apiand.TemplateEngine.Utils;
@@ -8,7 +9,7 @@ public class GenerateService : IGenerateService
 {
     public string ArchName { get; set; } = SingleLayerUtils.Name;
 
-    public void Handle(string workingDirectory, string projectDir, string argument,
+    public Result Handle(string workingDirectory, string projectDir, string argument,
         Dictionary<string, string> extraData,
         TemplateConfiguration configuration, IMessenger messenger)
     {
@@ -44,8 +45,7 @@ public class GenerateService : IGenerateService
 
         if (mainProject == null)
         {
-            messenger.WriteErrorMessage("Could not find a project in SingleLayer architecture.");
-            return;
+            return Result.Fail(TemplatingErrors.ProjectNotFound);
         }
 
         // Generate content using CodeBlocks
@@ -72,5 +72,7 @@ public class GenerateService : IGenerateService
 
         messenger.WriteStatusMessage($"Created interface at {Path.GetRelativePath(projectDir, interfacePath)}");
         messenger.WriteStatusMessage($"Created implementation at {Path.GetRelativePath(projectDir, implementationPath)}");
+        
+        return Result.Succeed();
     }
 }

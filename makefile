@@ -69,34 +69,39 @@ demo-reinstall-single-layer: clean reinstall
 # Add service
 .PHONY: add-service
 add-service: demo-reinstall
-	apiand generate service Orders.User -p $(PLAYGROUND_DIR)/$(DEMO_NAME)
+	apiand generate service Orders.User -o $(PLAYGROUND_DIR)/$(DEMO_NAME)
 
 # Add endpoint
 .PHONY: add-endpoint
 add-endpoint: demo-reinstall
-	apiand generate endpoint GetDemo -p $(PLAYGROUND_DIR)/$(DEMO_NAME) --http-method Put
+	apiand generate endpoint GetDemo -o $(PLAYGROUND_DIR)/$(DEMO_NAME) --http-method Put
 
 # Add entity
 .PHONY: add-entity
 add-entity: demo-reinstall
-	apiand generate entity orders.Customer -p $(PLAYGROUND_DIR)/$(DEMO_NAME) --attributes "name:string;email:string;status:enum[active,inactive]"
+	apiand generate entity orders.Customer -o $(PLAYGROUND_DIR)/$(DEMO_NAME) --attributes "name:string;email:string;status:enum[active,inactive]"
 
 # Add service single layer
 .PHONY: add-service-single-layer
 add-service-single-layer: demo-reinstall-single-layer
-	apiand generate service Orders.Shipment -p $(PLAYGROUND_DIR)/$(DEMO_NAME)
+	apiand generate service Orders.Shipment -o $(PLAYGROUND_DIR)/$(DEMO_NAME)
 
 # Add endpoint single layer
 .PHONY: add-endpoint-single-layer
 add-endpoint-single-layer: demo-reinstall-single-layer
-	apiand generate endpoint GetDemo -p $(PLAYGROUND_DIR)/$(DEMO_NAME) --http-method Put
+	apiand generate endpoint GetDemo -o $(PLAYGROUND_DIR)/$(DEMO_NAME) --http-method Put
 
 # Add entity single layer
 .PHONY: add-entity-single-layer
 add-entity-single-layer: demo-reinstall-single-layer
-	apiand generate entity orders.Customer -p $(PLAYGROUND_DIR)/$(DEMO_NAME) --attributes "name:string;email:string;status:enum[active,inactive]"
+	apiand generate entity orders.Customer -o $(PLAYGROUND_DIR)/$(DEMO_NAME) --attributes "name:string;email:string;status:enum[active,inactive]"
 
 # Verify which performs dotnet restore
 .PHONY: verify
 verify:
 	dotnet build $(PLAYGROUND_DIR)/$(DEMO_NAME)
+
+# Init
+.PHONY: init
+init: clean reinstall
+	apiand init --output $(PLAYGROUND_DIR)/

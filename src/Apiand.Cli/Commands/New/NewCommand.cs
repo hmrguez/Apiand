@@ -75,7 +75,7 @@ public class NewCommand : Command
         };
 
         var json = JsonSerializer.Serialize(config, config.GetType(), jsonOptions);
-        File.WriteAllText(Path.Combine(commandOptions.OutputPath, "apiand-config.json"), json);
+        File.WriteAllText(Path.Combine(commandOptions.OutputPath, "apiand.config.json"), json);
 
 
         // Create a new empty solution

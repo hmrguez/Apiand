@@ -77,7 +77,7 @@ public static class ArchitectureTypeFactory
     }
     
     
-    public static ICommandSpecification GetCommandImplementation(Type interfaceType, string architectureName)
+    public static ICommandSpecification? GetCommandImplementation(Type interfaceType, string architectureName)
     {
         if (!typeof(ICommandSpecification).IsAssignableFrom(interfaceType))
             return null;
