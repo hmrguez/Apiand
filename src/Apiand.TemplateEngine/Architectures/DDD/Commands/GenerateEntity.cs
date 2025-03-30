@@ -174,9 +174,7 @@ public class GenerateEntity : IGenerateEntity
             "double" => "double",
             "decimal" => "decimal",
             "bool" => "bool",
-            "boolean" => "bool",
             "datetime" => "DateTime",
-            "date" => "DateTime",
             "guid" => "Guid",
             _ => "string" // default to string for unknown types
         };

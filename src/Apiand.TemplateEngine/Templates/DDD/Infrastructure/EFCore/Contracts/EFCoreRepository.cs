@@ -2,10 +2,11 @@
 using Apiand.Extensions.DDD;
 using XXXnameXXX.Application.Contracts;
 using Microsoft.EntityFrameworkCore;
+using XXXnameXXX.Infrastructure.Data;
 
 namespace XXXnameXXX.Infrastructure.Contracts;
 
-public class EfCoreRepository<T>(DbContext context) : IRepository<T>
+public class EfCoreRepository<T>(ApplicationDbContext context) : IRepository<T>
     where T: Entity
 {
     public async Task<T?> GetByIdAsync(string id)
@@ -29,12 +30,13 @@ public class EfCoreRepository<T>(DbContext context) : IRepository<T>
     public async Task AddAsync(T entity)
     {
         await context.Set<T>().AddAsync(entity);
+        await context.SaveChangesAsync();
     }
 
-    public Task UpdateAsync(string id, T entity)
+    public async Task UpdateAsync(string id, T entity)
     {
         context.Set<T>().Update(entity);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(string id)
@@ -42,5 +44,7 @@ public class EfCoreRepository<T>(DbContext context) : IRepository<T>
         var element = await GetByIdAsync(id);
         if (element is not null) 
             context.Set<T>().Remove(element);
+        
+        await context.SaveChangesAsync();
     }
 }

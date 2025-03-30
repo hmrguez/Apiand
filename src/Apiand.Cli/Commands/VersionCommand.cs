@@ -11,6 +11,6 @@ public class VersionCommand : Command
 
     private void HandleCommand()
     {
-        Console.WriteLine("Apiand CLI v1.0.0");
+        Console.WriteLine("Apiand CLI v0.0.5");
     }
 }

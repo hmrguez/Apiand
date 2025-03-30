@@ -15,16 +15,16 @@ public class NewDddCommand : NewCommand
         var nameOption = new Option<string>("--name", "Project name") { IsRequired = true };
         nameOption.AddAlias("-n");
 
-        var apiTypeOption = new Option<string>("--api-type", "API type (rest, graphql, grpc)");
+        var apiTypeOption = new Option<string>("--api-type", "API type (FastEndpoints)");
         apiTypeOption.AddAlias("-api");
 
-        var dbTypeOption = new Option<string>("--db-type", "Database type (mongodb, sqlserver, postgres, none)");
+        var dbTypeOption = new Option<string>("--db-type", "Database type (MongoDB, EF Core)");
         dbTypeOption.AddAlias("-db");
 
-        var applicationOption = new Option<string>("--application", "Application layer type (mvc, webapi, none)");
+        var applicationOption = new Option<string>("--application", "Application layer type (MediatR)");
         applicationOption.AddAlias("-app");
 
-        var domainOption = new Option<string>("--domain", "Domain layer type (entityframework, dapper, none)");
+        var domainOption = new Option<string>("--domain", "Domain layer type (Default)");
         domainOption.AddAlias("-dom");
 
         AddOption(outputOption);

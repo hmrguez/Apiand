@@ -7,16 +7,13 @@ using XXXnameXXX.Infrastructure.DI;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
-var assemblies = new[]
-{
-    typeof(ApplicationModule).Assembly,
-    typeof(InfraModule).Assembly
-};
+List<IModule> modules =
+[
+    new ApplicationModule(),
+    new InfraModule()
+];
 
-var modules = assemblies
-    .SelectMany(a => a.GetTypes())
-    .Where(t => typeof(IModule).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
-    .Select(t => (IModule)Activator.CreateInstance(t)!)
+modules = modules 
     .Where(m => m.IsEnabled(builder.Configuration))
     .OrderBy(m => m.Order)
     .ToList();

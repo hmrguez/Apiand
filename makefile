@@ -52,7 +52,8 @@ api:
                		--output $(PLAYGROUND_DIR)/$(DEMO_NAME) \
                		--name $(DEMO_NAME) \
                		--api-type FastEndpoints \
-               		--db-type MongoDB
+               		--application MediatR \
+               		--db-type EFCore
                		
 # Demo and reinstall
 .PHONY: demo-reinstall

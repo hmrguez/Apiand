@@ -152,10 +152,7 @@ public sealed class DDD : ArchitectureType
             foreach (Layer layer in Enum.GetValues(typeof(Layer)))
             {
                 string layerName = layer.ToString();
-                // Handle special case for Presentation layer which is typically named as "Api"
-                string searchName = layer == Layer.Presentation ? "Api" : layerName;
-                
-                if (fileName.EndsWith(searchName, StringComparison.OrdinalIgnoreCase))
+                if (fileName.EndsWith(layerName, StringComparison.OrdinalIgnoreCase))
                 {
                     projectPaths[layer] = projectFile;
                     break;
@@ -208,12 +205,13 @@ public sealed class DDD : ArchitectureType
     private void AddProjectReference(string workingDirectory, string sourceProject, string targetProject)
     {
         // Convert to relative path
-        string relativePath = Path.GetRelativePath(Path.GetDirectoryName(sourceProject)!, targetProject);
+        sourceProject = sourceProject.Replace(workingDirectory, "./");
+        targetProject = targetProject.Replace(workingDirectory, "./");
         
         var psi = new ProcessStartInfo
         {
             FileName = "dotnet",
-            Arguments = $"add \"{sourceProject}\" reference \"{relativePath}\"",
+            Arguments = $"add \"{sourceProject}\" reference \"{targetProject}\"",
             WorkingDirectory = workingDirectory,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -222,5 +220,7 @@ public sealed class DDD : ArchitectureType
     
         using var process = Process.Start(psi);
         process?.WaitForExit();
+
+        Console.WriteLine(process?.ExitCode);
     }
 }
