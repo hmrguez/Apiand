@@ -10,7 +10,7 @@
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>apiand</ToolCommandName>
         <PackageOutputPath>./nupkg</PackageOutputPath>
-        <Version>0.1.1</Version>
+        <Version>0.2.0</Version>
         <Authors>Hector Rodriguez</Authors>
         <Description>Apiand CLI tool</Description>
     </PropertyGroup>
