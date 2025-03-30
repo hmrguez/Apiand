@@ -1,5 +1,6 @@
 using Apiand.TemplateEngine.Models;
 using Apiand.TemplateEngine.Models.Commands;
+using Apiand.TemplateEngine.Utils;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -51,8 +52,20 @@ public class GenerateEntity : IGenerateEntity
             attributes = ParseAttributes(attributesString);
         }
 
-        // Generate entity class content
-        string entityContent = GenerateEntityClass(className, configuration.ProjectName, subDirPath, attributes);
+        // Generate properties for entity
+        var propertiesBuilder = new StringBuilder();
+        foreach (var attr in attributes)
+        {
+            string propertyType = GetPropertyType(attr, className);
+            propertiesBuilder.AppendLine($"    public {propertyType} {CapitalizeFirst(attr.Name)} {{ get; set; }}");
+        }
+
+        // Generate entity class using CodeBlocks
+        string entityContent = CodeBlocks.GenerateEntityClass(
+            className, 
+            configuration.ProjectName, 
+            subDirPath, 
+            propertiesBuilder.ToString());
 
         // Write the entity file
         string entityPath = Path.Combine(entityDir, $"{className}.cs");
@@ -64,7 +77,24 @@ public class GenerateEntity : IGenerateEntity
         foreach (var enumAttribute in attributes.Where(a => a.Type.StartsWith("enum[")))
         {
             string enumName = $"{className}{char.ToUpper(enumAttribute.Name[0])}{enumAttribute.Name.Substring(1)}";
-            string enumContent = GenerateEnumClass(enumName, configuration.ProjectName, subDirPath, enumAttribute);
+            
+            // Generate enum values
+            var enumValuesBuilder = new StringBuilder();
+            if (enumAttribute.EnumValues.Count > 0)
+            {
+                for (int i = 0; i < enumAttribute.EnumValues.Count; i++)
+                {
+                    string value = enumAttribute.EnumValues[i];
+                    enumValuesBuilder.AppendLine($"    {CapitalizeFirst(value)}{(i < enumAttribute.EnumValues.Count - 1 ? "," : "")}");
+                }
+            }
+            
+            string enumContent = CodeBlocks.GenerateEnumClass(
+                enumName, 
+                configuration.ProjectName, 
+                subDirPath, 
+                enumValuesBuilder.ToString());
+                
             string enumPath = Path.Combine(entityDir, $"{enumName}.cs");
             File.WriteAllText(enumPath, enumContent);
             messenger.WriteStatusMessage($"Created enum at {Path.GetRelativePath(projectDirectory, enumPath)}");
@@ -107,55 +137,6 @@ public class GenerateEntity : IGenerateEntity
         }
 
         return attributes;
-    }
-
-    private string GenerateEntityClass(string className, string projectName, string subDirPath, List<EntityAttribute> attributes)
-    {
-        var sb = new StringBuilder();
-        string @namespace = $"{projectName}.Domain.Entities{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}";
-    
-        sb.AppendLine("using Apiand.Extensions.DDD;");
-        sb.AppendLine();
-        sb.AppendLine($"namespace {@namespace};");
-        sb.AppendLine();
-        sb.AppendLine($"public class {className} : Entity");
-        sb.AppendLine("{");
-    
-        // Add all specified attributes
-        foreach (var attr in attributes)
-        {
-            string propertyType = GetPropertyType(attr, className);
-            sb.AppendLine($"    public {propertyType} {CapitalizeFirst(attr.Name)} {{ get; set; }}");
-        }
-    
-        sb.AppendLine("}");
-    
-        return sb.ToString();
-    }
-
-    private string GenerateEnumClass(string enumName, string projectName, string subDirPath, EntityAttribute attribute)
-    {
-        var sb = new StringBuilder();
-        string @namespace = $"{projectName}.Domain.Entities{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}";
-
-        sb.AppendLine($"namespace {@namespace};");
-        sb.AppendLine();
-        sb.AppendLine($"public enum {enumName}");
-        sb.AppendLine("{");
-
-        // Add enum values with proper formatting
-        if (attribute.EnumValues.Count > 0)
-        {
-            for (int i = 0; i < attribute.EnumValues.Count; i++)
-            {
-                string value = attribute.EnumValues[i];
-                sb.AppendLine($"    {CapitalizeFirst(value)}{(i < attribute.EnumValues.Count - 1 ? "," : "")}");
-            }
-        }
-
-        sb.AppendLine("}");
-
-        return sb.ToString();
     }
 
     private string GetPropertyType(EntityAttribute attr, string entityName)

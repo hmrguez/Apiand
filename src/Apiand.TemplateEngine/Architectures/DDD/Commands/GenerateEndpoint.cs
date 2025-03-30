@@ -1,5 +1,6 @@
 using Apiand.TemplateEngine.Models;
 using Apiand.TemplateEngine.Models.Commands;
+using Apiand.TemplateEngine.Utils;
 
 namespace Apiand.TemplateEngine.Architectures.DDD.Commands;
 
@@ -62,72 +63,18 @@ public class GenerateEndpoint : IGenerateEndpoint
         Directory.CreateDirectory(requestsDir);
         Directory.CreateDirectory(dtosDir);
 
-        // Create the request class (command or query)
-        string requestContent =
-            $$"""
-              using MediatR;
-              using Apiand.Extensions.Models;
-              using {{configuration.ProjectName}}.Application.Dtos{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
+        // Generate file contents using CodeBlocks
+        string requestContent = CodeBlocks.GenerateEndpointRequest(
+            configuration.ProjectName, endpointClassName, requestTypeName, subDirPath, isQuery);
 
-              namespace {{configuration.ProjectName}}.Application.{{(isQuery ? "Queries" : "Commands")}}{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}}.{{endpointClassName}};
+        string handlerContent = CodeBlocks.GenerateEndpointHandler(
+            configuration.ProjectName, endpointClassName, requestTypeName, subDirPath, isQuery);
 
-              public class {{requestTypeName}}: IRequest<Result<{{endpointClassName}}Response>>
-              {
-                  // TODO: Add {{(isQuery ? "query" : "command")}} properties
-              }
-              """;
+        string responseContent = CodeBlocks.GenerateEndpointResponse(
+            configuration.ProjectName, endpointClassName, subDirPath);
 
-        // Create the handler class
-        string handlerContent =
-            $$"""
-              using Apiand.Extensions.Models;
-              using MediatR;
-              using Microsoft.Extensions.Logging;
-              using {{configuration.ProjectName}}.Application.Dtos{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
-
-              namespace {{configuration.ProjectName}}.Application.{{(isQuery ? "Queries" : "Commands")}}{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}}.{{endpointClassName}};
-
-              public class {{requestTypeName}}Handler(ILogger<{{requestTypeName}}Handler> logger) : IRequestHandler<{{requestTypeName}}, Result<{{endpointClassName}}Response>>
-              {
-                  public async Task<Result<{{endpointClassName}}Response>> Handle({{requestTypeName}} request, CancellationToken cancellationToken)
-                  {
-                      logger.LogInformation("Processing {{requestTypeName}}");
-                      
-                      // TODO: Implement handler logic
-                      
-                      return new {{endpointClassName}}Response();
-                  }
-              }
-              """;
-
-        // Create the response DTO
-        string responseContent =
-            $$"""
-              namespace {{configuration.ProjectName}}.Application.Dtos{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
-
-              public class {{endpointClassName}}Response
-              {
-                  // TODO: Add response properties
-              }
-              """;
-
-        // Create the endpoint class
-        string endpointContent =
-            $$"""
-              using {{configuration.ProjectName}}.Application.{{(isQuery ? "Queries" : "Commands")}}{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}}.{{endpointClassName}};
-              using {{configuration.ProjectName}}.Application.Dtos{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
-              using MediatR;
-              using {{configuration.ProjectName}}.Presentation.Models;
-
-              namespace {{configuration.ProjectName}}.Presentation.Endpoints{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
-
-              public class {{endpointClassName}}Endpoint(IMediator mediator) : CustomEndpoint<{{requestTypeName}}, {{endpointClassName}}Response>(mediator)
-              {
-                  protected override string Route => "{{endpointClassName.ToLowerInvariant()}}";
-                  protected override Models.HttpMethod Method => Models.HttpMethod.{{httpMethodStr}};
-                  protected override bool Secure => {{(isQuery ? "false" : "true")}};
-              }
-              """;
+        string endpointContent = CodeBlocks.GenerateEndpointClass(
+            configuration.ProjectName, endpointClassName, requestTypeName, subDirPath, httpMethodStr, isQuery);
 
         // Write the files
         string requestPath = Path.Combine(requestsDir, $"{requestTypeName}.cs");

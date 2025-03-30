@@ -47,30 +47,16 @@ public class GenerateService : IGenerateService
             return;
         }
 
-        // Create interface and implementation templates
-        string interfaceContent =
-            $$"""
-              namespace {{configuration.ProjectName}}.Application.Services{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
-                      
-              public interface I{{argument}}Service
-              {
-                  // TODO: Add service methods
-              }
-              """;
+        // Generate content using CodeBlocks
+        string interfaceContent = CodeBlocks.GenerateServiceInterface(
+            configuration.ProjectName, 
+            serviceClassName, 
+            subDirPath);
 
-        string implementationContent =
-            $$"""
-              using {{configuration.ProjectName}}.Application.Services{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
-              using Apiand.Extensions.Service;
-
-              namespace {{configuration.ProjectName}}.Infrastructure.Services{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
-
-              [Service]
-              public class {{argument}}Service : I{{argument}}Service
-              {
-                  // TODO: Implement service methods
-              }
-              """;
+        string implementationContent = CodeBlocks.GenerateServiceImplementation(
+            configuration.ProjectName, 
+            serviceClassName, 
+            subDirPath);
 
         // Create directories and files
         string interfaceDir = Path.Combine(applicationProject, "Services", subDirPath);
@@ -81,16 +67,6 @@ public class GenerateService : IGenerateService
 
         string interfacePath = Path.Combine(interfaceDir, $"I{serviceClassName}Service.cs");
         string implementationPath = Path.Combine(implementationDir, $"{serviceClassName}Service.cs");
-
-        // Process the content using the template engine if needed
-        var interfaceTemplateData = new Dictionary<string, string>(extraData);
-        var implementationTemplateData = new Dictionary<string, string>(extraData);
-
-        interfaceTemplateData["serviceNamespace"] =
-            $"{configuration.ProjectName}.Application.Services{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}";
-        implementationTemplateData["serviceNamespace"] =
-            $"{configuration.ProjectName}.Infrastructure.Services{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}";
-        interfaceTemplateData["interfaceNamespace"] = interfaceTemplateData["serviceNamespace"];
 
         // Write files
         File.WriteAllText(interfacePath, interfaceContent);

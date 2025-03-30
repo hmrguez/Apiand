@@ -220,7 +220,5 @@ public sealed class DDD : ArchitectureType
     
         using var process = Process.Start(psi);
         process?.WaitForExit();
-
-        Console.WriteLine(process?.ExitCode);
     }
 }
