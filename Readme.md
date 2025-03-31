@@ -18,11 +18,10 @@ After installation, you can use the `apiand` command from your terminal:
 apiand [command] [options]
 ```
 
-## Features and commands
+## Docs
 
 For features and commands refer to the [docs](https://hmrguez.github.io/apiand-docs)
 
-## Requirements
+Also consider contributing to the [docs](https://github.comhmrguez/apiand-docs) if you find any issues or have suggestions for improvements.
 
-- .NET 9.0+
-- .NET CLI
+Feel free to contribute to this project as well. Contributing may also be as easy as creating an issue or suggesting a feature.
