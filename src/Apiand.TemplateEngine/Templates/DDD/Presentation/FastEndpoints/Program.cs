@@ -1,6 +1,7 @@
 using Apiand.Extensions.Interfaces;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using Scalar.AspNetCore;
 using XXXnameXXX.Application;
 using XXXnameXXX.Infrastructure;
 using XXXnameXXX.Infrastructure.DI;
@@ -39,6 +40,7 @@ modules = modules
     var config = builder.Configuration;
 
     builder.Logging.AddOpenTelemetry(config);
+    builder.Services.AddOpenApi();
 }
 
 var app = builder.Build();
@@ -48,6 +50,8 @@ var app = builder.Build();
     app.UseFastEndpoints();
     app.UseOpenApi();
     app.UseSwaggerGen();
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 
     foreach (var module in modules) module.ConfigureApplication(app);
 

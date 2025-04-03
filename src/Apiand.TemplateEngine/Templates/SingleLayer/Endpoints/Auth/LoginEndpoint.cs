@@ -34,6 +34,7 @@ public class LoginEndpoint : Endpoint<LoginRequest, LoginResponse>
             s.Summary = "Authenticates a user";
             s.Description = "Validates user credentials and returns user information if valid";
         });
+        Description(x => x.WithTags("Auth"));
     }
     
     public override async Task HandleAsync(LoginRequest req, CancellationToken ct)

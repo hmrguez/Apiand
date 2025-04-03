@@ -26,6 +26,7 @@ public class GetWeatherRecordsEndpoint : Endpoint<GetWeatherRecordsRequest, IEnu
             s.Summary = "Gets weather records from database";
             s.Description = "Returns stored weather records from the database";
         });
+        Description(x => x.WithTags("Weather"));
     }
     
     public override async Task HandleAsync(GetWeatherRecordsRequest req, CancellationToken ct)

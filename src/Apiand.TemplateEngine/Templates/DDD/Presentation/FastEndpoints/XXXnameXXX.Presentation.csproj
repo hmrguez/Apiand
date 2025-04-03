@@ -13,10 +13,12 @@
       <PackageReference Include="FastEndpoints.Swagger" Version="5.34.0" />
       <PackageReference Include="MediatR" Version="12.4.1" />
       <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
+      <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="Scalar.AspNetCore" Version="2.1.5" />
     </ItemGroup>
 
     <ItemGroup>

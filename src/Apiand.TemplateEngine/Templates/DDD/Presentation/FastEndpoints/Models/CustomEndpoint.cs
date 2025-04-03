@@ -25,6 +25,8 @@ public abstract class CustomEndpoint<TRequest, TResult>(IMediator mediator) : En
 
         if (!Secure)
             AllowAnonymous();
+        
+        ExtraConfigure();
     }
 
     public override async Task HandleAsync(TRequest request, CancellationToken ct)
@@ -37,4 +39,9 @@ public abstract class CustomEndpoint<TRequest, TResult>(IMediator mediator) : En
     protected abstract string Route { get; }
     protected abstract HttpMethod Method { get; }
     protected abstract bool Secure { get; }
+
+    protected virtual void ExtraConfigure()
+    {
+        
+    }
 }

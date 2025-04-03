@@ -1,3 +1,4 @@
+using Apiand.Extensions.Models;
 using XXXnameXXX.Application.Todos.Dtos;
 using XXXnameXXX.Application.Todos.Queries.GetAll;
 using MediatR;
@@ -10,4 +11,11 @@ public class GetAll(IMediator mediator) : CustomEndpoint<GetAllTodoQuery, List<T
     protected override string Route => "/todos";
     protected override Models.HttpMethod Method => Models.HttpMethod.Get;
     protected override bool Secure => true;
+    
+    public override void Configure()
+    {
+        base.Configure();
+        
+        Description(x => x.WithTags("Todos"));
+    }
 }

@@ -33,6 +33,8 @@ public class AddWeatherRecordEndpoint : Endpoint<AddWeatherRecordRequest, AddWea
             s.Summary = "Adds a new weather record";
             s.Description = "Creates a new weather record in the database";
         });
+        Tags("Weather");
+        Description(x => x.WithTags("Weather"));
     }
     
     public override async Task HandleAsync(AddWeatherRecordRequest req, CancellationToken ct)

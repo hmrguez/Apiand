@@ -28,6 +28,8 @@ public class RegisterEndpoint : Endpoint<RegisterRequest, RegisterResponse>
             s.Summary = "Registers a new user";
             s.Description = "Creates a new user account in the system";
         });
+        
+        Description(x => x.WithTags("Auth"));
     }
     
     public override async Task HandleAsync(RegisterRequest req, CancellationToken ct)

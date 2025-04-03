@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Apiand.Extensions.Service;
+using Scalar.AspNetCore;
 using XXXnameXXX.Config;
 using XXXnameXXX.Data;
 using XXXnameXXX.Services;
@@ -47,6 +48,7 @@ builder.Services.AddAuthentication(options =>
     });
 
 builder.Services.AddAuthorization();
+builder.Services.AddOpenApi();
 
 // Register repositories
 builder.Services.AddScoped<IWeatherRepository, WeatherRepository>();
@@ -66,6 +68,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
     app.UseSwaggerGen();
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
