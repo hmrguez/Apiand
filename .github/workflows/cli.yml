@@ -71,10 +71,7 @@ jobs:
           body: |
             Apiand CLI Tool v${{ steps.get_version.outputs.VERSION }}
             
-            Installation:
-            ```
-            dotnet tool install --global Apiand.CLI
-            ```
+            Patch Notes:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
