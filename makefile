@@ -105,3 +105,17 @@ verify:
 .PHONY: init
 init: clean reinstall
 	apiand init --output $(PLAYGROUND_DIR)/
+	
+# Create a GitHub release with patch notes
+.PHONY: release
+release:
+	@echo "Creating GitHub release for version $(VERSION)"
+	@echo "Enter patch notes (end with Ctrl+D):"
+	@gh release create v$(VERSION) --title "v$(VERSION)" --notes-file -
+
+
+.PHONY: release-cli
+release-cli:
+	@echo "Creating GitHub CLI release for version $(VERSION)"
+	@echo "Enter patch notes (end with Ctrl+D):"
+	@gh release create cli-v$(VERSION) --title "CLI v$(VERSION)" --notes-file -
