@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Apiand.Extensions.Interfaces;
 
@@ -15,6 +16,13 @@ public interface IModule
     /// <param name="services">The service collection to add services to.</param>
     /// <param name="configuration">The application configuration.</param>
     void ConfigureServices(IServiceCollection services, IConfiguration configuration);
+
+    /// <summary>
+    /// Configures the application builder for the module.
+    /// </summary>
+    /// <param name="builder">Generally the WebApplicationBuilder the program starts with</param>
+    /// <param name="configuration">The application configuration</param>
+    void ConfigureWebAppBuilder(IHostApplicationBuilder builder, IConfiguration configuration);
     
     /// <summary>
     /// Configures the middleware and request pipeline for the module.
