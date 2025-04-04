@@ -11,14 +11,7 @@ namespace Apiand.Extensions.Interfaces;
 public interface IModule
 {
     /// <summary>
-    /// Configures the services required by the module.
-    /// </summary>
-    /// <param name="services">The service collection to add services to.</param>
-    /// <param name="configuration">The application configuration.</param>
-    void ConfigureServices(IServiceCollection services, IConfiguration configuration);
-
-    /// <summary>
-    /// Configures the application builder for the module.
+    /// Configures the application builder for the module, including services, logging, etc.
     /// </summary>
     /// <param name="builder">Generally the WebApplicationBuilder the program starts with</param>
     /// <param name="configuration">The application configuration</param>
