@@ -16,7 +16,9 @@ public static class DddOptions
         { Layer.Application, [Option.MediatR] },
         { Layer.Domain, [Option.Default] },
         { Layer.Presentation, [Option.Default, Option.FastEndpoints] },
-        { Layer.Infrastructure, [Option.EFCore, Option.MongoDB] }
+        { Layer.Infrastructure, [Option.EFCore, Option.MongoDB] },
+        { Layer.AppHost, [Option.Default] },
+        { Layer.ServiceDefaults, [Option.Default] }
     };
 
     public static Option[] GetByLayer(Layer layer)

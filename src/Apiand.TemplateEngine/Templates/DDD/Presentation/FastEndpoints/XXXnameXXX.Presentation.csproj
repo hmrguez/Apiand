@@ -23,7 +23,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\XXXnameXXX.Application\XXXnameXXX.Application.csproj" />
-      <ProjectReference Include="..\XXXnameXXX.Infrastructure.MongoDB\XXXnameXXX.Infrastructure.MongoDB.csproj" />
+      <ProjectReference Include="..\XXXnameXXX.Infrastructure.EfCore\XXXnameXXX.Infrastructure.EfCore.csproj" />
+      <ProjectReference Include="..\XXXnameXXX.ServiceDefaults\XXXnameXXX.ServiceDefaults.csproj" />
     </ItemGroup>
 
     <ItemGroup>

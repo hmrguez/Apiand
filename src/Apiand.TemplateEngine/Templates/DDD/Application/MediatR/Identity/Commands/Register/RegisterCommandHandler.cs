@@ -20,6 +20,7 @@ public class RegisterCommandHandler(IUserService userService, IMediator mediator
         var newUser = new User
         {
             Email = request.Email,
+            Username = request.Email,
             PasswordHash = request.Password
         };
         

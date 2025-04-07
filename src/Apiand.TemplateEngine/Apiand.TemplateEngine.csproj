@@ -21,4 +21,9 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Templates\DDD\AppHost\" />
+      <Folder Include="Templates\DDD\ServiceDefaults\" />
+    </ItemGroup>
 </Project>

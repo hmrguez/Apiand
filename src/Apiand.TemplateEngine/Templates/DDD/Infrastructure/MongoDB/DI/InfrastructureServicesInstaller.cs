@@ -9,14 +9,8 @@ namespace XXXnameXXX.Infrastructure.DI;
 
 public static class InfrastructureServicesInstaller
 {
-    public static void AddInfrastructure(this IServiceCollection services, string mongoConnectionString, string databaseName)
+    public static void AddInfrastructure(this IServiceCollection services)
     {
-        var client = new MongoClient(mongoConnectionString);
-        var database = client.GetDatabase(databaseName);
-        
-        services.AddSingleton(database);
-        services.AddScoped(typeof(IRepository<>), typeof(MongoRepository<>));
-        
         // Add other services here
     }
 }

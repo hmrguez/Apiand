@@ -32,15 +32,15 @@ modules = modules
     foreach (var module in modules)
     {
         module.ConfigureServices(builder.Services, builder.Configuration);
+        module.ConfigureWebAppBuilder(builder, builder.Configuration);
         module.RegisterMappings();
     }
+    
+    builder.AddServiceDefaults();
+    builder.Services.AddOpenApi();
 
     builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApplicationModule).Assembly));
-
-    var config = builder.Configuration;
-
-    builder.Logging.AddOpenTelemetry(config);
-    builder.Services.AddOpenApi();
+    
 }
 
 var app = builder.Build();
@@ -51,7 +51,7 @@ var app = builder.Build();
     app.UseOpenApi();
     app.UseSwaggerGen();
     app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapScalarApiReference(_ => _.Servers = []);
 
     foreach (var module in modules) module.ConfigureApplication(app);
 

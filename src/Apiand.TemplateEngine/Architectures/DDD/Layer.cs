@@ -7,5 +7,7 @@ public enum Layer
     Application,
     Domain,
     Infrastructure,
-    Presentation
+    Presentation,
+    AppHost,
+    ServiceDefaults
 }
