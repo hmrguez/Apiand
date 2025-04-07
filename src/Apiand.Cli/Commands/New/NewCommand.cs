@@ -29,7 +29,7 @@ public class NewCommand : Command
         AddCommand(new NewSingleLayer());
     }
 
-    protected void HandleArchCommand(ArchitectureType arch, CommandOptions commandOptions)
+    protected void HandleArchCommand(ArchitectureType arch, CommandOptions commandOptions, Dictionary<string, string> extraData)
     {
         Messenger.WriteStatusMessage("Validating configuration...");
 
@@ -60,9 +60,11 @@ public class NewCommand : Command
 
         Messenger.WriteStatusMessage("Generating project...");
         var data = new Dictionary<string, string>
-        {
-            ["name"] = config.ProjectName,
-        };
+            {
+                ["name"] = config.ProjectName,
+            }
+            .Concat(extraData)
+            .ToDictionary(x => x.Key, x => x.Value);
 
         Processor.CreateFromTemplateVariants(templatePaths, commandOptions.OutputPath, data);
 

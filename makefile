@@ -48,12 +48,10 @@ version:
 # Demo api
 .PHONY: api
 api:
-	apiand new ddd \
-               		--output $(PLAYGROUND_DIR)/$(DEMO_NAME) \
-               		--name $(DEMO_NAME) \
-               		--api-type FastEndpoints \
+	apiand new ddd --output $(PLAYGROUND_DIR)/$(DEMO_NAME) --name $(DEMO_NAME) \
+               		--presentation FastEndpoints \
                		--application MediatR \
-               		--db-type EFCore
+               		--infrastructure EFCore
                		
 # Demo and reinstall
 .PHONY: demo-reinstall
@@ -108,5 +106,5 @@ init: clean reinstall
 	
 .PHONY: blank
 blank: clean reinstall
-	apiand new ddd --output $(PLAYGROUND_DIR)/$(DEMO_NAME) --name $(DEMO_NAME) 
+	apiand new ddd --output $(PLAYGROUND_DIR)/$(DEMO_NAME) --name $(DEMO_NAME) --skip-interactive
 

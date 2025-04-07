@@ -32,7 +32,8 @@ public sealed class DDD : ArchitectureType
             Presentation = GetOrDefault(commandOptions.Presentation, Layer.Presentation),
             Infrastructure = GetOrDefault(commandOptions.Infrastructure, Layer.Infrastructure),
             OutputPath = commandOptions.OutputPath,
-            ProjectName = commandOptions.ProjectName ?? Path.GetFileName(Path.GetFullPath(commandOptions.OutputPath))
+            ProjectName = commandOptions.ProjectName ?? Path.GetFileName(Path.GetFullPath(commandOptions.OutputPath)),
+            DbType = commandOptions.DbType
         };
 
 

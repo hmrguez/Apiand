@@ -6,6 +6,8 @@ public class CommandOptions
     public string? ProjectName { get; set; }
     public string? Presentation { get; set; } = string.Empty;
     public string? Infrastructure { get; set; } = string.Empty;
+    
+    public string DbType { get; set; } = string.Empty;
     public string? Application { get; set; }
     public string? Domain { get; set; }
 }

@@ -29,6 +29,6 @@ public class NewSingleLayer : NewCommand
             ProjectName = name
         };
 
-        HandleArchCommand(new SingleLayer(), commandOptions);
+        HandleArchCommand(new SingleLayer(), commandOptions, new Dictionary<string, string>());
     }
 }
