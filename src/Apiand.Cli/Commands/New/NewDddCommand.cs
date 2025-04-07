@@ -15,11 +15,11 @@ public class NewDddCommand : NewCommand
         var nameOption = new Option<string>("--name", "Project name") { IsRequired = true };
         nameOption.AddAlias("-n");
 
-        var apiTypeOption = new Option<string>("--api-type", "API type (FastEndpoints)");
-        apiTypeOption.AddAlias("-api");
+        var apiTypeOption = new Option<string>("--presentation", "API type (FastEndpoints)");
+        apiTypeOption.AddAlias("-pre");
 
-        var dbTypeOption = new Option<string>("--db-type", "Database type (MongoDB, EF Core)");
-        dbTypeOption.AddAlias("-db");
+        var dbTypeOption = new Option<string>("--infrastructure", "Database type (MongoDB, EF Core)");
+        dbTypeOption.AddAlias("-inf");
 
         var applicationOption = new Option<string>("--application", "Application layer type (MediatR)");
         applicationOption.AddAlias("-app");
@@ -45,8 +45,8 @@ public class NewDddCommand : NewCommand
         {
             OutputPath = output ?? "./" + name,
             ProjectName = name,
-            ApiType = api,
-            DbType = db,
+            Presentation = api,
+            Infrastructure = db,
             Application = application,
             Domain = domain
         };

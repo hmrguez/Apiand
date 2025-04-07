@@ -26,11 +26,11 @@ public sealed class DDD : ArchitectureType
     {
         var temp = new DddTemplateConfiguration
         {
-            Application = GetOrDefault(commandOptions.Application),
+            Application = GetOrDefault(commandOptions.Application, Layer.Application),
             ArchName = Name,
-            Domain = GetOrDefault(commandOptions.Domain),
-            Presentation = GetOrDefault(commandOptions.ApiType),
-            Infrastructure = GetOrDefault(commandOptions.DbType),
+            Domain = GetOrDefault(commandOptions.Domain, Layer.Domain),
+            Presentation = GetOrDefault(commandOptions.Presentation, Layer.Presentation),
+            Infrastructure = GetOrDefault(commandOptions.Infrastructure, Layer.Infrastructure),
             OutputPath = commandOptions.OutputPath,
             ProjectName = commandOptions.ProjectName ?? Path.GetFileName(Path.GetFullPath(commandOptions.OutputPath))
         };
@@ -39,9 +39,9 @@ public sealed class DDD : ArchitectureType
         return temp;
     }
 
-    private static Option? GetOrDefault(string? value)
+    private static Option? GetOrDefault(string? value, Layer layer)
     {
-        return string.IsNullOrEmpty(value) ? Option.Default : value.Dehumanize<Option>();
+        return string.IsNullOrEmpty(value) ? DddOptions.GetByLayer(layer).FirstOrDefault() : value.Dehumanize<Option>();
     }
 
     public override ValidationResult Validate(TemplateConfiguration configuration)
@@ -144,17 +144,8 @@ public sealed class DDD : ArchitectureType
     
     public override void ExecutePostCreationCommands(string outputPath, string projectName)
     {
-        
-        // Find all project files
         var projectFiles = Directory.GetFiles(outputPath, "*.csproj", SearchOption.AllDirectories);
         
-        // Clear existing project references for all projects
-        foreach (var projectFile in projectFiles)
-        {
-            RemoveAllProjectReferences(projectFile);
-        }
-        
-        // Create mappings for easier reference
         var projectPaths = new Dictionary<Layer, string>();
         var specialProjects = new Dictionary<string, string>();
         
@@ -162,7 +153,6 @@ public sealed class DDD : ArchitectureType
         {
             var fileName = Path.GetFileNameWithoutExtension(projectFile);
             
-            // Check for AppHost and ServiceDefaults special projects
             if (fileName.EndsWith(".AppHost", StringComparison.OrdinalIgnoreCase) || 
                 fileName.EndsWith(".ServiceDefaults", StringComparison.OrdinalIgnoreCase))
             {
@@ -181,11 +171,8 @@ public sealed class DDD : ArchitectureType
             }
         }
         
-        // No projects found, nothing to reference
         if (projectPaths.Count == 0 && specialProjects.Count == 0)
             return;
-        
-        // Add references according to DDD architecture
         
         // 1. Application references Domain
         if (projectPaths.TryGetValue(Layer.Application, out var appProject) && 
@@ -226,7 +213,6 @@ public sealed class DDD : ArchitectureType
         var appHostProject = specialProjects.FirstOrDefault(p => p.Key.EndsWith(".AppHost", StringComparison.OrdinalIgnoreCase)).Value;
         var serviceDefaultsProject = specialProjects.FirstOrDefault(p => p.Key.EndsWith(".ServiceDefaults", StringComparison.OrdinalIgnoreCase)).Value;
         
-        // Add service defaults reference to the appHost and the presentation project, and add the presentation project to the appHost
         if (!string.IsNullOrEmpty(appHostProject) && !string.IsNullOrEmpty(serviceDefaultsProject))
         {
             AddProjectReference(outputPath, appHostProject, apiProject);
@@ -253,51 +239,5 @@ public sealed class DDD : ArchitectureType
     
         using var process = Process.Start(psi);
         process?.WaitForExit();
-
-        Console.WriteLine(process?.StandardOutput.ReadToEnd());
-    }
-    
-    private void RemoveAllProjectReferences(string projectPath)
-    {
-        if (!File.Exists(projectPath))
-            return;
-        
-        // Find all project references in the csproj file
-        var projectDir = Path.GetDirectoryName(projectPath);
-        var projectContent = File.ReadAllText(projectPath);
-        
-        // Use regex to find all ProjectReference elements
-        var referenceMatches = System.Text.RegularExpressions.Regex.Matches(
-            projectContent, 
-            @"<ProjectReference Include=""([^""]+)""");
-        
-        if (referenceMatches.Count == 0)
-            return;
-        
-        foreach (System.Text.RegularExpressions.Match match in referenceMatches)
-        {
-            string referencePath = match.Groups[1].Value;
-            
-            // Use dotnet CLI to remove the reference
-            var psi = new ProcessStartInfo
-            {
-                FileName = "dotnet",
-                Arguments = $"remove \"{projectPath}\" reference \"{referencePath}\"",
-                WorkingDirectory = projectDir,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false
-            };
-            
-            using var process = Process.Start(psi);
-            process?.WaitForExit();
-            
-            // For debugging
-            var output = process?.StandardOutput.ReadToEnd();
-            if (!string.IsNullOrEmpty(output) && !output.Contains("could not be found"))
-            {
-                Console.WriteLine(output);
-            }
-        }
     }
 }
