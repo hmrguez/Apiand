@@ -62,16 +62,21 @@ jobs:
       - name: Extract version from tag
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/cli-v}" >> $GITHUB_OUTPUT
+        
+      - name: Extract latest changelog entry
+        id: changelog
+        run: |
+          notes=$(awk '/^## /{if(x) exit; x=1; next} x' CHANGELOG.md)
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$notes" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: ./artifacts/*.nupkg
           name: CLI v${{ steps.get_version.outputs.VERSION }}
-          body: |
-            Apiand CLI Tool v${{ steps.get_version.outputs.VERSION }}
-            
-            Patch Notes:
+          body: ${{ steps.changelog.outputs.notes }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
