@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Apiand.Extensions" Version="0.0.7" />
+      <PackageReference Include="Aspire.MongoDB.Driver" Version="9.1.0" />
+      <PackageReference Include="Aspire.RabbitMQ.Client.v7" Version="9.1.0" />
+      <PackageReference Include="DotNetCore.CAP" Version="8.3.3" />
+      <PackageReference Include="DotNetCore.CAP.InMemoryStorage" Version="8.3.3" />
+      <PackageReference Include="DotNetCore.CAP.RabbitMQ" Version="8.3.3" />
+      <PackageReference Include="FastEndpoints" Version="6.0.0-beta.11" />
+      <PackageReference Include="FastEndpoints.Swagger" Version="6.0.0-beta.11" />
+      <PackageReference Include="MongoDB.Driver" Version="2.30.0" />
+      <PackageReference Include="Scalar.AspNetCore" Version="2.1.9" />
+    </ItemGroup>
+
+</Project>

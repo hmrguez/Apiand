@@ -107,4 +107,8 @@ init: clean reinstall
 .PHONY: blank
 blank: clean reinstall
 	apiand new ddd --output $(PLAYGROUND_DIR)/$(DEMO_NAME) --name $(DEMO_NAME) --skip-interactive
+	
+.PHONY: microservices
+microservices: clean reinstall
+	apiand new microservices --output $(PLAYGROUND_DIR)/$(DEMO_NAME) --name $(DEMO_NAME)
 

@@ -42,11 +42,11 @@ public class NewDddCommand : NewCommand
         AddOption(domainOption);
         AddOption(interactiveOption);
 
-        this.SetHandler(HandleDddCommand, outputOption, nameOption, presentationOption, infraOption, applicationOption,
+        this.SetHandler(HandleCommand, outputOption, nameOption, presentationOption, infraOption, applicationOption,
             domainOption, interactiveOption, dbTypeOption);
     }
 
-    private void HandleDddCommand(string? output, string name, string? presentation, string? infra, string? application,
+    private void HandleCommand(string? output, string name, string? presentation, string? infra, string? application,
         string? domain, bool skipInteractive, string? dbType)
     {
         // Define available options for each layer

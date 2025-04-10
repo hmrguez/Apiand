@@ -1,34 +1,38 @@
 using System.CommandLine;
 using Apiand.TemplateEngine.Architectures.DDD;
-using Apiand.TemplateEngine.Architectures.SingleLayer;
+using Apiand.TemplateEngine.Architectures.Microservices;
 using Apiand.TemplateEngine.Models;
+using Spectre.Console;
 
 namespace Apiand.Cli.Commands.New;
 
-public class NewSingleLayer : NewCommand
+public class NewMicroservicesCommand : NewCommand
 {
-    public NewSingleLayer() : base("single-layer", "Creates a new single layer architecture")
+    public NewMicroservicesCommand() : base("microservices", "Creates a new DDD project")
     {
+        // Shared Options
         var outputOption = new Option<string>("--output", "The output directory");
         outputOption.AddAlias("-o");
 
         var nameOption = new Option<string>("--name", "Project name") { IsRequired = true };
         nameOption.AddAlias("-n");
-        
+
         AddOption(outputOption);
         AddOption(nameOption);
-        
+
         this.SetHandler(HandleCommand, outputOption, nameOption);
     }
-    
+
     private void HandleCommand(string? output, string name)
     {
         var commandOptions = new CommandOptions
         {
             OutputPath = output ?? "./" + name,
-            ProjectName = name
+            ProjectName = name,
         };
 
-        HandleArchCommand(new SingleLayer(), commandOptions, new Dictionary<string, string>());
+        var extraOptions = new Dictionary<string, string>();
+
+        HandleArchCommand(new Microservices(), commandOptions, extraOptions);
     }
 }

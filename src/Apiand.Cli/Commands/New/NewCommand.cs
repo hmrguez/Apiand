@@ -27,6 +27,7 @@ public class NewCommand : Command
     {
         AddCommand(new NewDddCommand());
         AddCommand(new NewSingleLayer());
+        AddCommand(new NewMicroservicesCommand());
     }
 
     protected void HandleArchCommand(ArchitectureType arch, CommandOptions commandOptions, Dictionary<string, string> extraData)
