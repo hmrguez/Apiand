@@ -112,3 +112,7 @@ blank: clean reinstall
 microservices: clean reinstall
 	apiand new microservices --output $(PLAYGROUND_DIR)/$(DEMO_NAME) --name $(DEMO_NAME)
 
+.PHONY: micro-extra
+micro-extra: microservices
+	apiand generate project Todo -o $(PLAYGROUND_DIR)/$(DEMO_NAME)
+

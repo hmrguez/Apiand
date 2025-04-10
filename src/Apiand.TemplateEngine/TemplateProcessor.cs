@@ -41,7 +41,7 @@ public class TemplateProcessor
         return new TemplateMetadata();
     }
                 
-    private void CopyAndProcessDirectory(string sourcePath, string targetPath, Dictionary<string, string> data, TemplateMetadata metadata)
+    public void CopyAndProcessDirectory(string sourcePath, string targetPath, Dictionary<string, string> data, TemplateMetadata metadata)
     {
         // Get source directories
         foreach (var directory in Directory.GetDirectories(sourcePath))

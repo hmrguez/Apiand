@@ -20,6 +20,7 @@ public class GenerateCommand : Command
         RegisterComponentGenerator("service", "Add a new service to the project", typeof(IGenerateService));
         RegisterComponentGenerator("endpoint", "Add a new endpoint to the project", typeof(IGenerateEndpoint));
         RegisterComponentGenerator("entity", "Add a new entity to the project", typeof(IGenerateEntity));
+        RegisterComponentGenerator("project", "Add a new project to the microservices solution", typeof(IGenerateProject));
     }
 
     private void RegisterComponentGenerator(string commandName, string description, Type implementationType)
