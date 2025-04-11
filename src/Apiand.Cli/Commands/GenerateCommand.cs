@@ -20,7 +20,8 @@ public class GenerateCommand : Command
         RegisterComponentGenerator("service", "Add a new service to the project", typeof(IGenerateService));
         RegisterComponentGenerator("endpoint", "Add a new endpoint to the project", typeof(IGenerateEndpoint));
         RegisterComponentGenerator("entity", "Add a new entity to the project", typeof(IGenerateEntity));
-        RegisterComponentGenerator("project", "Add a new project to the microservices solution", typeof(IGenerateProject));
+        RegisterComponentGenerator("project", "Add a new project to the microservices solution",
+            typeof(IGenerateProject));
     }
 
     private void RegisterComponentGenerator(string commandName, string description, Type implementationType)
@@ -35,6 +36,9 @@ public class GenerateCommand : Command
         outputOption.AddAlias("-o");
         command.AddOption(outputOption);
 
+        var aiOption = new Option<string>("--ai", $"The ai prompt for the generated snippets");
+        command.AddOption(aiOption);
+
         // Add HTTP method option only for endpoint command
         Option<string>? httpMethodOption = null;
         if (commandName == "endpoint")
@@ -47,12 +51,16 @@ public class GenerateCommand : Command
             command.AddOption(httpMethodOption);
 
             command.SetHandler(
-                (name, path, httpMethod) =>
+                (name, path, httpMethod, ai) =>
                 {
-                    var data = new Dictionary<string, string> { ["http-method"] = httpMethod };
+                    var data = new Dictionary<string, string>
+                    {
+                        ["http-method"] = httpMethod,
+                        ["ai"] = ai
+                    };
                     HandleGenerateComponent(name, path, commandName, implementationType, data);
                 },
-                nameArgument, outputOption, httpMethodOption);
+                nameArgument, outputOption, httpMethodOption, aiOption);
         }
         else if (commandName == "entity")
         {
@@ -63,22 +71,29 @@ public class GenerateCommand : Command
             command.AddOption(attributesOption);
 
             command.SetHandler(
-                (name, path, attributes) =>
+                (name, path, attributes, ai) =>
                 {
-                    var data = new Dictionary<string, string>();
-                    if (!string.IsNullOrEmpty(attributes))
+                    var data = new Dictionary<string, string>
                     {
-                        data["attributes"] = attributes;
-                    }
+                        ["attributes"] = attributes,
+                        ["ai"] = ai
+                    };
                     HandleGenerateComponent(name, path, commandName, implementationType, data);
                 },
-                nameArgument, outputOption, attributesOption);
+                nameArgument, outputOption, attributesOption, aiOption);
         }
         else
         {
             command.SetHandler(
-                (name, path) => HandleGenerateComponent(name, path, commandName, implementationType),
-                nameArgument, outputOption);
+                (name, path, ai) =>
+                {
+                    var data = new Dictionary<string, string>
+                    {
+                        ["ai"] = ai
+                    };
+                    HandleGenerateComponent(name, path, commandName, implementationType, data);
+                },
+                nameArgument, outputOption, aiOption);
         }
 
         AddCommand(command);
@@ -131,14 +146,15 @@ public class GenerateCommand : Command
 
         // Get the appropriate implementation based on component type and architecture
         var implementation = ArchitectureTypeFactory.GetCommandImplementation(implementationType, config.ArchName);
-        if(implementation == null)
+        if (implementation == null)
         {
-            _messenger.WriteErrorMessage($"No implementation found for generate {componentType} in architecture {config.ArchName}");
+            _messenger.WriteErrorMessage(
+                $"No implementation found for generate {componentType} in architecture {config.ArchName}");
             return;
         }
-        
+
         var result = implementation.Handle(workingDirectory, projectDir, normalizedName, data, config, _messenger);
-        if(result.IsSuccess)
+        if (result.IsSuccess)
             _messenger.WriteSuccessMessage(
                 $"{char.ToUpper(componentType[0])}{componentType.Substring(1)} {normalizedName} added successfully!");
         else
@@ -172,7 +188,7 @@ public class GenerateCommand : Command
         {
             name = name.Substring(0, name.Length - typeSuffix.Length);
         }
-    
+
         // Handle dot-separated format by capitalizing each segment
         if (name.Contains('.'))
         {
@@ -184,15 +200,16 @@ public class GenerateCommand : Command
                     segments[i] = char.ToUpper(segments[i][0]) + segments[i].Substring(1);
                 }
             }
+
             return string.Join(".", segments);
         }
-    
+
         // Capitalize first letter for simple names
         if (!string.IsNullOrEmpty(name))
         {
             name = char.ToUpper(name[0]) + name.Substring(1);
         }
-    
+
         return name;
     }
 

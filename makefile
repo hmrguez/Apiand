@@ -51,7 +51,8 @@ api:
 	apiand new ddd --output $(PLAYGROUND_DIR)/$(DEMO_NAME) --name $(DEMO_NAME) \
                		--presentation FastEndpoints \
                		--application MediatR \
-               		--infrastructure EFCore
+               		--infrastructure EFCore \
+               		--skip-interactive
                		
 # Demo and reinstall
 .PHONY: demo-reinstall
@@ -67,7 +68,7 @@ demo-reinstall-single-layer: clean reinstall
 # Add service
 .PHONY: add-service
 add-service: demo-reinstall
-	apiand generate service Orders.User -o $(PLAYGROUND_DIR)/$(DEMO_NAME)
+	apiand generate service Orders.User -o $(PLAYGROUND_DIR)/$(DEMO_NAME) --ai "With methods for getting the shipment and creating a new one. The implementation can remain empty"
 
 # Add endpoint
 .PHONY: add-endpoint
@@ -82,7 +83,7 @@ add-entity: demo-reinstall
 # Add service single layer
 .PHONY: add-service-single-layer
 add-service-single-layer: demo-reinstall-single-layer
-	apiand generate service Orders.Shipment -o $(PLAYGROUND_DIR)/$(DEMO_NAME)
+	apiand generate service Orders.Shipment -o $(PLAYGROUND_DIR)/$(DEMO_NAME) 
 
 # Add endpoint single layer
 .PHONY: add-endpoint-single-layer

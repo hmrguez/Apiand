@@ -1,4 +1,5 @@
 using Apiand.Extensions.Models;
+using Apiand.TemplateEngine.Ai;
 using Apiand.TemplateEngine.Models;
 using Apiand.TemplateEngine.Models.Commands;
 using Apiand.TemplateEngine.Utils;
@@ -58,6 +59,13 @@ public class GenerateService : IGenerateService
             configuration.ProjectName, 
             serviceClassName, 
             subDirPath);
+
+        var aiService = new AiService();
+        if (extraData.TryGetValue("ai", out var ai))
+        {
+            interfaceContent = aiService.FillTemplateAsync(interfaceContent, "This is the service interface for the following prompt: " + ai).Result;
+            implementationContent = aiService.FillTemplateAsync(implementationContent, "This is the service implementation for the following prompt: " + ai).Result;
+        }
 
         // Create directories and files
         string interfaceDir = Path.Combine(applicationProject, "Services", subDirPath);
