@@ -117,3 +117,6 @@ microservices: clean reinstall
 micro-extra: microservices
 	apiand generate project Todo -o $(PLAYGROUND_DIR)/$(DEMO_NAME)
 
+.PHONY: micro-extra-2
+micro-extra-2: micro-extra
+	generate service Orders.User -o $(PLAYGROUND_DIR)/$(DEMO_NAME)/$(DEMO_NAME).Inventory

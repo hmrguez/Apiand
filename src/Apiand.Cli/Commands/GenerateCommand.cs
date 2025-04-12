@@ -122,11 +122,22 @@ public class GenerateCommand : Command
 
         _messenger.WriteStatusMessage("Loading project configuration...");
 
-        var config = LoadProjectConfig<TemplateConfiguration>(configFilePath);
-        if (config == null)
+
+        TemplateConfiguration? config = null;
+        if (!File.Exists(configFilePath))
         {
             _messenger.WriteWarningMessage("Failed to load project configuration. Defaulting to standalone");
             config = TemplateConfiguration.Default(workingDirectory);
+        }
+        
+        if (config == null)
+        {
+            config = LoadProjectConfig<TemplateConfiguration>(configFilePath);
+            if (config == null)
+            {
+                _messenger.WriteWarningMessage("Failed to load project configuration. Defaulting to standalone");
+                config = TemplateConfiguration.Default(workingDirectory);
+            }
         }
 
         _messenger.WriteStatusMessage($"Creating {componentType} {normalizedName} in project {config.ProjectName}...");
@@ -143,7 +154,7 @@ public class GenerateCommand : Command
         if (implementation == null)
         {
             _messenger.WriteErrorMessage(
-                $"No implementation found for generate {componentType} in architecture {config.ArchName}");
+                $"No implementation found for generate {componentType} in architecture {config.ArchName}, defaulting to standalone");
             return;
         }
 
@@ -160,17 +171,6 @@ public class GenerateCommand : Command
         // Start from specified directory and look up for apiand.config.json
         var currentDir = startingDirectory;
         var configFile = Path.Combine(currentDir, "apiand.config.json");
-
-        while (!File.Exists(configFile))
-        {
-            var parentDir = Directory.GetParent(currentDir)?.FullName;
-            if (parentDir == null || parentDir == currentDir)
-                return string.Empty;
-
-            currentDir = parentDir;
-            configFile = Path.Combine(currentDir, "apiand.config.json");
-        }
-
         return configFile;
     }
 
