@@ -1,4 +1,5 @@
 using Apiand.Extensions.Models;
+using Apiand.TemplateEngine.Ai;
 using Apiand.TemplateEngine.Models;
 using Apiand.TemplateEngine.Models.Commands;
 using Apiand.TemplateEngine.Utils;

@@ -106,12 +106,15 @@ public class NewDddCommand : NewCommand
             }
             else
             {
-                dbType = AnsiConsole.Prompt(
-                    new SelectionPrompt<string>()
-                        .Title("Select [green]Database[/] type:")
-                        .PageSize(10)
-                        .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
-                        .AddChoices(dbTypeOptions))
+                if (skipInteractive)
+                    dbType = "PostgreSQL";
+                else
+                    dbType = AnsiConsole.Prompt(
+                            new SelectionPrompt<string>()
+                                .Title("Select [green]Database[/] type:")
+                                .PageSize(10)
+                                .MoreChoicesText("[grey](Move up and down to reveal more options)[/]")
+                                .AddChoices(dbTypeOptions))
                         .ToLower();
             }
         }
