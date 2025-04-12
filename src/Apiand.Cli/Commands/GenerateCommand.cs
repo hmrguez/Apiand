@@ -36,9 +36,6 @@ public class GenerateCommand : Command
         outputOption.AddAlias("-o");
         command.AddOption(outputOption);
 
-        var aiOption = new Option<string>("--ai", $"The ai prompt for the generated snippets");
-        command.AddOption(aiOption);
-
         // Add HTTP method option only for endpoint command
         Option<string>? httpMethodOption = null;
         if (commandName == "endpoint")
@@ -51,16 +48,15 @@ public class GenerateCommand : Command
             command.AddOption(httpMethodOption);
 
             command.SetHandler(
-                (name, path, httpMethod, ai) =>
+                (name, path, httpMethod) =>
                 {
                     var data = new Dictionary<string, string>
                     {
                         ["http-method"] = httpMethod,
-                        ["ai"] = ai
                     };
                     HandleGenerateComponent(name, path, commandName, implementationType, data);
                 },
-                nameArgument, outputOption, httpMethodOption, aiOption);
+                nameArgument, outputOption, httpMethodOption);
         }
         else if (commandName == "entity")
         {
@@ -71,29 +67,27 @@ public class GenerateCommand : Command
             command.AddOption(attributesOption);
 
             command.SetHandler(
-                (name, path, attributes, ai) =>
+                (name, path, attributes) =>
                 {
                     var data = new Dictionary<string, string>
                     {
                         ["attributes"] = attributes,
-                        ["ai"] = ai
                     };
                     HandleGenerateComponent(name, path, commandName, implementationType, data);
                 },
-                nameArgument, outputOption, attributesOption, aiOption);
+                nameArgument, outputOption, attributesOption);
         }
         else
         {
             command.SetHandler(
-                (name, path, ai) =>
+                (name, path) =>
                 {
                     var data = new Dictionary<string, string>
                     {
-                        ["ai"] = ai
                     };
                     HandleGenerateComponent(name, path, commandName, implementationType, data);
                 },
-                nameArgument, outputOption, aiOption);
+                nameArgument, outputOption);
         }
 
         AddCommand(command);

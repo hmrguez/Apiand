@@ -68,7 +68,7 @@ demo-reinstall-single-layer: clean reinstall
 # Add service
 .PHONY: add-service
 add-service: demo-reinstall
-	apiand generate service Orders.User -o $(PLAYGROUND_DIR)/$(DEMO_NAME) --ai "With methods for getting the shipment and creating a new one. The implementation can remain empty"
+	apiand generate service Orders.User -o $(PLAYGROUND_DIR)/$(DEMO_NAME)
 
 # Add endpoint
 .PHONY: add-endpoint

@@ -60,13 +60,6 @@ public class GenerateService : IGenerateService
             serviceClassName, 
             subDirPath);
 
-        var aiService = new AiService();
-        if (extraData.TryGetValue("ai", out var ai))
-        {
-            interfaceContent = aiService.FillTemplateAsync(interfaceContent, "This is the service interface for the following prompt: " + ai).Result;
-            implementationContent = aiService.FillTemplateAsync(implementationContent, "This is the service implementation for the following prompt: " + ai).Result;
-        }
-
         // Create directories and files
         string interfaceDir = Path.Combine(applicationProject, "Services", subDirPath);
         string implementationDir = Path.Combine(infrastructureProject, "Services", subDirPath);
