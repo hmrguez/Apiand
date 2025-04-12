@@ -125,8 +125,8 @@ public class GenerateCommand : Command
         var config = LoadProjectConfig<TemplateConfiguration>(configFilePath);
         if (config == null)
         {
-            _messenger.WriteErrorMessage("Failed to load project configuration.");
-            return;
+            _messenger.WriteWarningMessage("Failed to load project configuration. Defaulting to standalone");
+            config = TemplateConfiguration.Default(workingDirectory);
         }
 
         _messenger.WriteStatusMessage($"Creating {componentType} {normalizedName} in project {config.ProjectName}...");

@@ -28,4 +28,13 @@ public class ConsoleMessenger : IMessenger
         Console.WriteLine(message);
         Console.ResetColor();
     }
+
+    public void WriteWarningMessage(string message)
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.Write("⚠ ");
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine(message);
+        Console.ResetColor();
+    }
 }
