@@ -15,8 +15,12 @@ public class NewSingleLayer : NewCommand
         var nameOption = new Option<string>("--name", "Project name") { IsRequired = true };
         nameOption.AddAlias("-n");
         
+        var interactiveOption = new Option<bool>("--skip-interactive", "Don't use interactive for missing options");
+        interactiveOption.AddAlias("-si");
+        
         AddOption(outputOption);
         AddOption(nameOption);
+        AddOption(interactiveOption);
         
         this.SetHandler(HandleCommand, outputOption, nameOption);
     }

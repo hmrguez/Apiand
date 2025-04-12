@@ -12,9 +12,9 @@ public class EntityAttribute
     public static List<EntityAttribute> ParseAttributes(string attributesString)
     {
         var attributes = new List<EntityAttribute>();
-        var attributePairs = attributesString.Split(';', StringSplitOptions.RemoveEmptyEntries);
+        var attributePairs = attributesString?.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
-        foreach (var pair in attributePairs)
+        foreach (var pair in attributePairs ?? [])
         {
             var parts = pair.Trim().Split(':', 2);
             if (parts.Length == 2)
