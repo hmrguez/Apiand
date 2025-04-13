@@ -49,7 +49,6 @@ version:
 .PHONY: api
 api:
 	apiand new ddd --output $(PLAYGROUND_DIR)/$(DEMO_NAME) --name $(DEMO_NAME) \
-               		--presentation FastEndpoints \
                		--application MediatR \
                		--infrastructure EFCore \
                		--skip-interactive

@@ -1,5 +1,6 @@
 namespace Apiand.TemplateEngine.Utils;
 
+
 public static class CodeBlocks
 {
     // Endpoint generation templates
@@ -129,4 +130,75 @@ public static class CodeBlocks
         }
         """;
     }
+
+    // GraphQL templates
+    public static string GenerateGraphQLQuery(string projectName, string domainName, string queryName, string subDirPath, bool isNewFile)
+    {
+        string classContent = $$"""
+            using {{projectName}}.Application.Dtos{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
+            using {{projectName}}.Application.Queries{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}}.{{queryName}};
+            using MediatR;
+
+            namespace {{projectName}}.Presentation.Queries{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
+
+            public partial class Query
+            {
+                public async Task<Apiand.Extensions.Models.Result<{{queryName}}Response>> {{queryName}}([Service] IMediator mediator, {{queryName}}Query query, CancellationToken cancellationToken)
+                {
+                    return await mediator.Send(query, cancellationToken);
+                }
+            }
+            """;
+
+        if (isNewFile)
+        {
+            return classContent;
+        }
+        else
+        {
+            // Just return the method to be appended to existing file
+            return $$"""
+                public async Task<Apiand.Extensions.Models.Result<{{queryName}}Response>> {{queryName}}([Service] IMediator mediator, {{queryName}}Query query, CancellationToken cancellationToken)
+                {
+                    return await mediator.Send(query, cancellationToken);
+                }
+                """;
+        }
+    }
+
+    public static string GenerateGraphQLMutation(string projectName, string domainName, string mutationName, string subDirPath, bool isNewFile)
+    {
+        string classContent = $$"""
+            using {{projectName}}.Application.Commands{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}}.{{mutationName}};
+            using {{projectName}}.Application.Dtos{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
+            
+            using MediatR;
+
+            namespace {{projectName}}.Presentation.Mutations{{(subDirPath.Length > 0 ? "." + subDirPath.Replace("/", ".") : "")}};
+
+            public partial class Mutation
+            {
+                public async Task<Apiand.Extensions.Models.Result<{{mutationName}}Response>> {{mutationName}}([Service] IMediator mediator, {{mutationName}}Command command, CancellationToken cancellationToken)
+                {
+                    return await mediator.Send(command, cancellationToken);
+                }
+            }
+            """;
+
+        if (isNewFile)
+        {
+            return classContent;
+        }
+        else
+        {
+            // Just return the method to be appended to existing file
+            return $$"""
+                public async Task<Apiand.Extensions.Models.Result<{{mutationName}}Response>> {{mutationName}}([Service] IMediator mediator, {{mutationName}}Command command, CancellationToken cancellationToken)
+                {
+                    return await mediator.Send(command, cancellationToken);
+                }
+                """;
+        }
+    }
 }
+

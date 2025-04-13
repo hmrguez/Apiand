@@ -7,6 +7,7 @@ public enum Option
     FastEndpoints,
     EFCore,
     MongoDB,
+    GraphQL
 }
 
 public static class DddOptions
@@ -15,7 +16,7 @@ public static class DddOptions
     {
         { Layer.Application, [Option.MediatR] },
         { Layer.Domain, [Option.Default] },
-        { Layer.Presentation, [Option.Default, Option.FastEndpoints] },
+        { Layer.Presentation, [Option.FastEndpoints, Option.GraphQL] },
         { Layer.Infrastructure, [Option.EFCore, Option.MongoDB] },
         { Layer.AppHost, [Option.Default] },
         { Layer.ServiceDefaults, [Option.Default] }

@@ -50,7 +50,7 @@ public class NewDddCommand : NewCommand
         string? domain, bool skipInteractive, string? dbType)
     {
         // Define available options for each layer
-        var presentationOptions = new[] { "FastEndpoints" };
+        var presentationOptions = new[] { "FastEndpoints, GraphQL" };
         var infrastructureOptions = new[] { "MongoDB", "EFCore" };
         var dbTypeOptions = new[] { "SQLServer", "PostgreSQL" };
         var applicationOptions = new[] { "MediatR" };

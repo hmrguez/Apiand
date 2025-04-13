@@ -151,7 +151,8 @@ public class GenerateCommand : Command
         
         if (config == null)
         {
-            config = LoadProjectConfig<TemplateConfiguration>(configFilePath);
+            var t = ArchitectureTypeFactory.GetConfigurationType("ddd");
+            config = LoadProjectConfig(configFilePath, t);
             if (config == null)
             {
                 _messenger.WriteWarningMessage("Failed to load project configuration. Defaulting to standalone");
@@ -226,23 +227,21 @@ public class GenerateCommand : Command
         return name;
     }
 
-    private TemplateConfiguration? LoadProjectConfig<T>(string configPath) where T : TemplateConfiguration
+    private TemplateConfiguration? LoadProjectConfig(string configPath, Type configurationType)
     {
         try
         {
             var jsonContent = File.ReadAllText(configPath);
-            var t = JsonSerializer.Deserialize<T>(jsonContent,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-            if (t != null) return t;
-
-            return JsonSerializer.Deserialize<TemplateConfiguration>(jsonContent,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        
+            // Use the JsonSerializer.Deserialize overload that accepts a Type parameter
+            var result = JsonSerializer.Deserialize(jsonContent, configurationType, options);
+            return result as TemplateConfiguration;
         }
         catch (Exception ex)
         {
             _messenger.WriteErrorMessage($"Error loading configuration: {ex.Message}");
-            return null!;
+            return null;
         }
     }
 }
