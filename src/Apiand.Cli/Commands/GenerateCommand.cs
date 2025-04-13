@@ -77,6 +77,25 @@ public class GenerateCommand : Command
                 },
                 nameArgument, outputOption, attributesOption);
         }
+        else if (commandName == "project")
+        {
+            var graphQlOption = new Option<bool>(
+                "--graphql",
+                "Use the graphql template");
+            graphQlOption.AddAlias("-gql");
+            command.AddOption(graphQlOption);
+
+            command.SetHandler(
+                (name, path, graphql) =>
+                {
+                    var data = new Dictionary<string, string>
+                    {
+                        ["graphql"] = graphql ? "true" : "false",
+                    };
+                    HandleGenerateComponent(name, path, commandName, implementationType, data);
+                },
+                nameArgument, outputOption, graphQlOption);
+        }
         else
         {
             command.SetHandler(

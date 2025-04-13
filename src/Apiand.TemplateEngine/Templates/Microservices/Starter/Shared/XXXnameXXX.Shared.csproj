@@ -19,4 +19,8 @@
       <PackageReference Include="Scalar.AspNetCore" Version="2.1.9" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\XXXnameXXX.ServiceDefaults\XXXnameXXX.ServiceDefaults.csproj" />
+    </ItemGroup>
+
 </Project>
